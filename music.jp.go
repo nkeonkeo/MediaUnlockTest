@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func musicJP(c http.Client) Result {
+func MusicJP(c http.Client) Result {
 	req, err := http.NewRequest("GET", "https://overseaauth.music-book.jp/globalIpcheck.js", nil)
 	if err != nil {
 		return Result{Success: false, Err: err}

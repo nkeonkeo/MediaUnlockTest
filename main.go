@@ -23,9 +23,10 @@ func main() {
 	// log.Println(DMM(Ipv4HttpClient))
 	// log.Println(Abema(Ipv4HttpClient))
 	// log.Println(VideoMarket(Ipv4HttpClient))
-	// log.Println(musicJP(Ipv4HttpClient))
+	// log.Println(MusicJP(Ipv4HttpClient))
 	// log.Println(Telasa(Ipv4HttpClient))
 	// log.Println(Paravi(Ipv4HttpClient))
 	// log.Println(U_NEXT(Ipv4HttpClient))
-	log.Println(HuluJP(Ipv4HttpClient))
+	// log.Println(HuluJP(Ipv4HttpClient))
+	log.Println(TVer(Ipv4HttpClient))
 }
