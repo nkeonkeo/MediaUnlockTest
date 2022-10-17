@@ -28,5 +28,5 @@ func main() {
 	// log.Println(Paravi(Ipv4HttpClient))
 	// log.Println(U_NEXT(Ipv4HttpClient))
 	// log.Println(HuluJP(Ipv4HttpClient))
-	log.Println(TVer(Ipv4HttpClient))
+	log.Println(GYAO(Ipv4HttpClient))
 }
