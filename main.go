@@ -1,5 +1,7 @@
 package main
 
+import "log"
+
 func main() {
 	// log.Println(Dazn(Ipv4HttpClient))
 	// log.Println(Hotstar(Ipv4HttpClient))
@@ -22,4 +24,6 @@ func main() {
 	// log.Println(Abema(Ipv4HttpClient))
 	// log.Println(VideoMarket(Ipv4HttpClient))
 	// log.Println(musicJP(Ipv4HttpClient))
+	// log.Println(Telasa(Ipv4HttpClient))
+	log.Println(Paravi(Ipv4HttpClient))
 }
