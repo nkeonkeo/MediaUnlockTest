@@ -32,5 +32,6 @@ func main() {
 	// log.Println(FOD(Ipv4HttpClient))
 	// log.Println(Radiko(Ipv4HttpClient))
 	// log.Println(Karaoke(Ipv4HttpClient))
-	log.Println(J_COM_ON_DEMAND(Ipv4HttpClient))
+	// log.Println(J_COM_ON_DEMAND(Ipv4HttpClient))
+	log.Println(Kancolle(Ipv4HttpClient))
 }
