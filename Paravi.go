@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -26,7 +25,7 @@ func Paravi(c http.Client) Result {
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	log.Println(string(b))
+	// log.Println(string(b))
 	var res struct {
 		Error struct {
 			Type string
