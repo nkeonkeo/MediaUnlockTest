@@ -2,7 +2,6 @@ package main
 
 import (
 	"io"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -26,7 +25,7 @@ func GYAO(c http.Client) Result {
 		return Result{Success: false, Err: err}
 	}
 	s := string(b)
-	log.Println(s)
+	// log.Println(s)
 	if strings.Contains(s, "foreign") || strings.Contains(s, "DISALLOW_ADDRESS") {
 		return Result{Success: false}
 	}

@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -22,7 +21,7 @@ func Telasa(c http.Client) Result {
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	log.Println(string(b))
+	// log.Println(string(b))
 	var res struct {
 		Status struct {
 			Type    string

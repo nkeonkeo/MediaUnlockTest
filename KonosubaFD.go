@@ -3,7 +3,7 @@ package main
 import "net/http"
 
 func KonosubaFD(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://api.konosubafd.jp/api/masterlist", nil)
+	req, err := http.NewRequest("POST", "https://api.konosubafd.jp/api/masterlist", nil)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
