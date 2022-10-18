@@ -3,7 +3,7 @@ package main
 import "net/http"
 
 func PrettyDerbyJP(c http.Client) Result {
-	resp, err := GET_Dalvik(c, "https://api-umamusume.cygames.jp")
+	resp, err := GET_Dalvik(c, "https://api-umamusume.cygames.jp/")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}

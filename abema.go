@@ -7,22 +7,10 @@ import (
 )
 
 func Abema(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://api.abema.io/v1/ip/check?device=android", nil)
+	resp, err := GET_Dalvik(c, "https://api.abema.io/v1/ip/check?device=android")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	req.Header.Add("user-agent", UA_Dalvik)
-
-	var resp *http.Response
-	for i := 0; i < 3; i++ {
-		if resp, err = c.Do(req); err == nil {
-			break
-		}
-	}
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
-
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: err}

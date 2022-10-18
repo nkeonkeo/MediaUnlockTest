@@ -4,13 +4,7 @@ import "net/http"
 
 // Princess Connect Re:Dive Japan
 func PCRJP(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://api-priconne-redive.cygames.jp/", nil)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
-	req.Header.Set("User-Agent", UA_Dalvik)
-
-	resp, err := c.Do(req)
+	resp, err := GET_Dalvik(c, "https://api-priconne-redive.cygames.jp/")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}

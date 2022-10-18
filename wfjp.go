@@ -4,13 +4,7 @@ import "net/http"
 
 // World Flipper Japan
 func WFJP(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://api.worldflipper.jp", nil)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
-	req.Header.Set("User-Agent", UA_Dalvik)
-
-	resp, err := c.Do(req)
+	resp, err := GET_Dalvik(c, "https://api.worldflipper.jp/")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}

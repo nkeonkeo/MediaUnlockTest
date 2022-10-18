@@ -53,15 +53,19 @@ func ShowResult(r Result) (s string) {
 		if r.Err != nil {
 			return FontYellow + "ERR: (" + r.Err.Error() + ")" + FontSuffix
 		} else if r.Info != "" {
-			return FontRed + "NO (" + r.Info + ")" + FontSuffix
+			return FontRed + " NO (" + r.Info + ")" + FontSuffix
 		} else {
-			return FontRed + "NO" + FontSuffix
+			return FontRed + " NO" + FontSuffix
 		}
 	}
 	return
 }
 
 func main() {
+	// log.Println(Abema(Ipv4HttpClient))
+	// return
+	bar = progressbar.Default(48, "testing ...")
+
 	excute("Dazn", Dazn, Ipv4HttpClient)
 	excute("Hotstar", Hotstar, Ipv4HttpClient)
 	excute("Disney+", DisneyPlus, Ipv4HttpClient)
@@ -113,11 +117,11 @@ func main() {
 	excute("Princess Connect Re:Dive Japan", PCRJP, Ipv4HttpClient)
 	excute("World Flipper Japan", WFJP, Ipv4HttpClient)
 	excute("Project Sekai: Colorful Stage", PJSK, Ipv4HttpClient)
-	bar = progressbar.Default(int64(len(R)), "testing ...")
+
 	wg.Wait()
 	bar.Describe("Finished")
-	bar.Finish()
 	bar.Clear()
+	bar.Finish()
 
 	NameLength := 0
 	for _, r := range R {

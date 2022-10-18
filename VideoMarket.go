@@ -8,19 +8,13 @@ import (
 )
 
 func VideoMarket(c http.Client) Result {
-	req, err := http.NewRequest("POST", "https://api-p.videomarket.jp/v2/authorize/access_token", strings.NewReader(
+	resp, err := PostForm(c, "https://api-p.videomarket.jp/v2/authorize/access_token",
 		`grant_type=client_credentials&client_id=1eolxdrti3t58m2f2k8yi0kli105743b6f8c8295&client_secret=lco0nndn3l9tcbjdfdwlswmee105743b739cfb5a`,
-	))
+	)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	req.Header.Set("User-Agent", UA_Browser)
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	resp, err := c.Do(req)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: err}
@@ -35,7 +29,7 @@ func VideoMarket(c http.Client) Result {
 		return Result{Success: false}
 	}
 
-	req, err = http.NewRequest("POST", "https://api-p.videomarket.jp/v2/api/play/keyissue", strings.NewReader(
+	req, err := http.NewRequest("POST", "https://api-p.videomarket.jp/v2/api/play/keyissue", strings.NewReader(
 		`fullStoryId=118008001&playChromeCastFlag=false&loginFlag=0`,
 	))
 	if err != nil {

@@ -7,12 +7,7 @@ import (
 )
 
 func LineTV(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://www.linetv.tw/api/part/11829/eps/1/part?chocomemberId=", nil)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
-
-	resp, err := c.Do(req)
+	resp, err := GET(c, "https://www.linetv.tw/api/part/11829/eps/1/part?chocomemberId=")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
