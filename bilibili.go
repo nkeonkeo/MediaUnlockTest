@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-func bilibili(c http.Client, u string) Result {
-	req, err := http.NewRequest("GET", "https://api.bilibili.com/pgc/player/web/playurl?avid=18281381&cid=29892777&qn=0&type=&otype=json&ep_id=183799&fourk=1&fnver=0&fnval=16&module=bangumi", nil)
+func bilibili(c http.Client, url string) Result {
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
@@ -21,15 +21,17 @@ func bilibili(c http.Client, u string) Result {
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	var res bilibiliRes
+	var res struct {
+		Code int
+	}
 	if err := json.Unmarshal(b, &res); err != nil {
 		return Result{Success: false, Err: err}
 	}
-	if res.Code == 0 {
-		return Result{Success: true}
-	}
 	if res.Code == -10403 {
 		return Result{Success: false}
+	}
+	if res.Code == 0 {
+		return Result{Success: true}
 	}
 	return Result{Success: false, Info: "unknown"}
 }
@@ -40,8 +42,4 @@ func BilibiliHKMCTW(c http.Client) Result {
 
 func BilibiliTW(c http.Client) Result {
 	return bilibili(c, "https://api.bilibili.com/pgc/player/web/playurl?avid=50762638&cid=100279344&qn=0&type=&otype=json&ep_id=268176&fourk=1&fnver=0&fnval=16&module=bangumi")
-}
-
-type bilibiliRes struct {
-	Code int
 }

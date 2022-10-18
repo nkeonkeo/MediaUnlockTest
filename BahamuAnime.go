@@ -1,0 +1,33 @@
+package main
+
+import (
+	"encoding/json"
+	"io"
+	"net/http"
+)
+
+func BahamuAnime(c http.Client) Result {
+	req, err := http.NewRequest("GET", "https://ani.gamer.com.tw/ajax/token.php?adID=89422&sn=14667", nil)
+	if err != nil {
+		return Result{Success: false, Err: err}
+	}
+
+	resp, err := c.Do(req)
+	if err != nil {
+		return Result{Success: false, Err: err}
+	}
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return Result{Success: false, Err: err}
+	}
+	var res struct {
+		AnimeSn int
+	}
+	if err := json.Unmarshal(b, &res); err != nil {
+		return Result{Success: false}
+	}
+	if res.AnimeSn != 0 {
+		return Result{Success: true}
+	}
+	return Result{Success: false}
+}
