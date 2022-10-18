@@ -42,7 +42,7 @@ func NetflixRegion(c http.Client) Result {
 }
 
 func NetflixCDN(c http.Client) Result {
-	r, err := http.NewRequest("GET", "https://api.fast.com/netflix/speedtest/v2?https=true&token=YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm&urlCount=1", nil)
+	r, err := http.NewRequest("GET", "https://api.fast.com/netflix/speedtest/v2?https=true&token=YXNkZmFzZGxmbnNkYWZoYXNkZmhrYWxm&urlCount=5", nil)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
