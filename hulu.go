@@ -32,6 +32,7 @@ func HuluJP(c http.Client) Result {
 	req.Header.Set("sec-fetch-site", "none")
 	req.Header.Set("sec-fetch-user", "?1")
 	req.Header.Set("upgrade-insecure-requests", "1")
+
 	resp, err := cdo(c, req)
 	if err != nil {
 		return Result{Success: false, Err: err}
