@@ -45,7 +45,7 @@ func VideoMarket(c http.Client) Result {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("X-Authorization", res.AccessToken)
 
-	resp, err = c.Do(req)
+	resp, err = cdo(c, req)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
@@ -65,7 +65,7 @@ func VideoMarket(c http.Client) Result {
 	req.Header.Set("User-Agent", UA_Browser)
 	req.Header.Set("X-Authorization", res.AccessToken)
 
-	resp, err = c.Do(req)
+	resp, err = cdo(c, req)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}

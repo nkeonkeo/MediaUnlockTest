@@ -16,9 +16,10 @@ type result struct {
 
 var R = []*result{}
 
-var bar = progressbar.Default(-1, "testing ...")
+var bar *progressbar.ProgressBar
+var wg = &sync.WaitGroup{}
 
-func excute(Name string, F func(c http.Client) Result, C http.Client, wg *sync.WaitGroup) {
+func excute(Name string, F func(c http.Client) Result, C http.Client) {
 	r := &result{Name: Name}
 	R = append(R, r)
 	wg.Add(1)
@@ -50,7 +51,7 @@ func ShowResult(r Result) (s string) {
 		s += FontSuffix
 	} else {
 		if r.Err != nil {
-			return FontYellow + "ERR: " + r.Err.Error() + ")" + FontSuffix
+			return FontYellow + "ERR: (" + r.Err.Error() + ")" + FontSuffix
 		} else if r.Info != "" {
 			return FontRed + "NO (" + r.Info + ")" + FontSuffix
 		} else {
@@ -61,63 +62,62 @@ func ShowResult(r Result) (s string) {
 }
 
 func main() {
+	excute("Dazn", Dazn, Ipv4HttpClient)
+	excute("Hotstar", Hotstar, Ipv4HttpClient)
+	excute("Disney+", DisneyPlus, Ipv4HttpClient)
+	excute("Netflix", NetflixRegion, Ipv4HttpClient)
+	excute("Netflix CDN", NetflixCDN, Ipv4HttpClient)
+	excute("Youtube", YoutubeRegion, Ipv4HttpClient)
+	excute("Youtube CDN", YoutubeCDN, Ipv4HttpClient)
+	excute("Prime Video", PrimeVideo, Ipv4HttpClient)
+	excute("TVBAnywhere+", TVBAnywhere, Ipv4HttpClient)
+	excute("iQyi Region", IqRegion, Ipv4HttpClient)
+	excute("Viu.com", ViuCom, Ipv4HttpClient)
+	excute("Spotify", Spotify, Ipv4HttpClient)
+	excute("Steam", Steam, Ipv4HttpClient)
 
-	wg := &sync.WaitGroup{}
-	excute("Dazn", Dazn, Ipv4HttpClient, wg)
-	excute("Hotstar", Hotstar, Ipv4HttpClient, wg)
-	excute("DisneyPlus", DisneyPlus, Ipv4HttpClient, wg)
-	excute("Netflix", NetflixRegion, Ipv4HttpClient, wg)
-	excute("NetflixCDN", NetflixCDN, Ipv4HttpClient, wg)
-	excute("Youtube", YoutubeRegion, Ipv4HttpClient, wg)
-	excute("YoutubeCDN", YoutubeCDN, Ipv4HttpClient, wg)
-	excute("PrimeVideo", PrimeVideo, Ipv4HttpClient, wg)
-	excute("TVBAnywhere", TVBAnywhere, Ipv4HttpClient, wg)
-	excute("IqRegion", IqRegion, Ipv4HttpClient, wg)
-	excute("ViuCom", ViuCom, Ipv4HttpClient, wg)
-	excute("Spotify", Spotify, Ipv4HttpClient, wg)
+	excute("Viu.TV", ViuTV, Ipv4HttpClient)
+	excute("Now E", NowE, Ipv4HttpClient)
+	excute("MyTVSuper", MyTvSuper, Ipv4HttpClient)
+	excute("HBO GO Aisa", HboGoAisa, Ipv4HttpClient)
+	excute("BiliBili Hongkong/Macau/Taiwan", BilibiliHKMCTW, Ipv4HttpClient)
 
-	excute("Steam", Steam, Ipv4HttpClient, wg)
-	excute("ViuTV", ViuTV, Ipv4HttpClient, wg)
-	excute("NowE", NowE, Ipv4HttpClient, wg)
-	excute("MyTvSuper", MyTvSuper, Ipv4HttpClient, wg)
-	excute("HboGoAisa", HboGoAisa, Ipv4HttpClient, wg)
-	excute("BilibiliHKMCTW", BilibiliHKMCTW, Ipv4HttpClient, wg)
+	excute("KKTV", KKTV, Ipv4HttpClient)
+	excute("LiTV", LiTV, Ipv4HttpClient)
+	excute("MyVideo", MyVideo, Ipv4HttpClient)
+	excute("TW4GTV", TW4GTV, Ipv4HttpClient)
+	excute("LineTV", LineTV, Ipv4HttpClient)
+	excute("HamiVideo", HamiVideo, Ipv4HttpClient)
+	excute("Catchplay+", Catchplay, Ipv4HttpClient)
+	excute("Bahamu Anime", BahamuAnime, Ipv4HttpClient)
+	excute("HBO GO Aisa", HboGoAisa, Ipv4HttpClient)
+	excute("Bilibili Taiwan Only", BilibiliTW, Ipv4HttpClient)
 
-	excute("DMM", DMM, Ipv4HttpClient, wg)
-	excute("Abema", Abema, Ipv4HttpClient, wg)
-	excute("Niconico", Niconico, Ipv4HttpClient, wg)
-	excute("MusicJP", MusicJP, Ipv4HttpClient, wg)
-	excute("Telasa", Telasa, Ipv4HttpClient, wg)
-	excute("Paravi", Paravi, Ipv4HttpClient, wg)
-	excute("U_NEXT", U_NEXT, Ipv4HttpClient, wg)
-	excute("HuluJP", HuluJP, Ipv4HttpClient, wg)
-	excute("GYAO", GYAO, Ipv4HttpClient, wg)
-	excute("VideoMarket", VideoMarket, Ipv4HttpClient, wg)
-	excute("FOD", FOD, Ipv4HttpClient, wg)
-	excute("Radiko", Radiko, Ipv4HttpClient, wg)
-	excute("Karaoke", Karaoke, Ipv4HttpClient, wg)
-	excute("J_COM_ON_DEMAND", J_COM_ON_DEMAND, Ipv4HttpClient, wg)
-	excute("Kancolle", Kancolle, Ipv4HttpClient, wg)
-	excute("PrettyDerbyJP", PrettyDerbyJP, Ipv4HttpClient, wg)
-	excute("KonosubaFD", KonosubaFD, Ipv4HttpClient, wg)
-	excute("PCRJP", PCRJP, Ipv4HttpClient, wg)
-	excute("WFJP", WFJP, Ipv4HttpClient, wg)
-	excute("PJSK", PJSK, Ipv4HttpClient, wg)
-
-	excute("KKTV", KKTV, Ipv4HttpClient, wg)
-	excute("LiTV", LiTV, Ipv4HttpClient, wg)
-	excute("MyVideo", MyVideo, Ipv4HttpClient, wg)
-	excute("TW4GTV", TW4GTV, Ipv4HttpClient, wg)
-	excute("LineTV", LineTV, Ipv4HttpClient, wg)
-	excute("HamiVideo", HamiVideo, Ipv4HttpClient, wg)
-	excute("Catchplay", Catchplay, Ipv4HttpClient, wg)
-	excute("BahamuAnime", BahamuAnime, Ipv4HttpClient, wg)
-	excute("HboGoAisa", HboGoAisa, Ipv4HttpClient, wg)
-	excute("BilibiliTW", BilibiliTW, Ipv4HttpClient, wg)
-
+	excute("DMM", DMM, Ipv4HttpClient)
+	excute("Abema", Abema, Ipv4HttpClient)
+	excute("Niconico", Niconico, Ipv4HttpClient)
+	excute("music.jp", MusicJP, Ipv4HttpClient)
+	excute("Telasa", Telasa, Ipv4HttpClient)
+	excute("Paravi", Paravi, Ipv4HttpClient)
+	excute("U-NEXT", U_NEXT, Ipv4HttpClient)
+	excute("Hulu Japan", HuluJP, Ipv4HttpClient)
+	excute("GYAO!", GYAO, Ipv4HttpClient)
+	excute("VideoMarket", VideoMarket, Ipv4HttpClient)
+	excute("FOD(Fuji TV)", FOD, Ipv4HttpClient)
+	excute("Radiko", Radiko, Ipv4HttpClient)
+	excute("Karaoke@DAM", Karaoke, Ipv4HttpClient)
+	excute("J:COM On Demand", J_COM_ON_DEMAND, Ipv4HttpClient)
+	excute("Kancolle", Kancolle, Ipv4HttpClient)
+	excute("Pretty Derby Japan", PrettyDerbyJP, Ipv4HttpClient)
+	excute("Konosuba Fantastic Days", KonosubaFD, Ipv4HttpClient)
+	excute("Princess Connect Re:Dive Japan", PCRJP, Ipv4HttpClient)
+	excute("World Flipper Japan", WFJP, Ipv4HttpClient)
+	excute("Project Sekai: Colorful Stage", PJSK, Ipv4HttpClient)
+	bar = progressbar.Default(int64(len(R)), "testing ...")
 	wg.Wait()
 	bar.Describe("Finished")
 	bar.Finish()
+	bar.Clear()
 
 	NameLength := 0
 	for _, r := range R {

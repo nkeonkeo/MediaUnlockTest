@@ -7,12 +7,7 @@ import (
 )
 
 func BahamuAnime(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://ani.gamer.com.tw/ajax/token.php?adID=89422&sn=14667", nil)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
-
-	resp, err := c.Do(req)
+	resp, err := GET(c, "https://ani.gamer.com.tw/ajax/token.php?adID=89422&sn=14667")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}

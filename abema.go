@@ -13,10 +13,16 @@ func Abema(c http.Client) Result {
 	}
 	req.Header.Add("user-agent", UA_Dalvik)
 
-	resp, err := c.Do(req)
+	var resp *http.Response
+	for i := 0; i < 3; i++ {
+		if resp, err = c.Do(req); err == nil {
+			break
+		}
+	}
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
+
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: err}
@@ -26,10 +32,10 @@ func Abema(c http.Client) Result {
 	if err := json.Unmarshal(b, &res); err != nil {
 		return Result{Success: false, Err: err}
 	}
-	if res.IsoCountryCode=="JP"{
+	if res.IsoCountryCode == "JP" {
 		return Result{Success: true}
 	}
-	return Result{Success: false,Info: "Oversea Only"}
+	return Result{Success: false, Info: "Oversea Only"}
 }
 
 type abemaRes struct {

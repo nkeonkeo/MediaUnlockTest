@@ -13,7 +13,7 @@ func Telasa(c http.Client) Result {
 	}
 	req.Header.Set("X-Device-ID", "d36f8e6b-e344-4f5e-9a55-90aeb3403799")
 
-	resp, err := c.Do(req)
+	resp, err := cdo(c, req)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}

@@ -7,13 +7,7 @@ import (
 )
 
 func Radiko(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://radiko.jp/area?_=1625406539531", nil)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
-	req.Header.Set("User-Agent", UA_Browser)
-
-	resp, err := c.Do(req)
+	resp, err := GET(c, "https://radiko.jp/area?_=1625406539531")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}

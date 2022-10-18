@@ -7,14 +7,7 @@ import (
 )
 
 func HuluJP(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://id.hulu.jp", nil)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
-	req.Header.Set("User-Agent", UA_Browser)
-	c.CheckRedirect = nil
-
-	resp, err := c.Do(req)
+	resp, err := GET(c, "https://id.hulu.jp")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}

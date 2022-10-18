@@ -7,16 +7,11 @@ import (
 )
 
 func FOD(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://geocontrol1.stream.ne.jp/fod-geo/check.xml?time=1624504256", nil)
+	resp, err := GET(c, "https://geocontrol1.stream.ne.jp/fod-geo/check.xml?time=1624504256")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	req.Header.Set("User-Agent", UA_Browser)
 
-	resp, err := c.Do(req)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: err}
