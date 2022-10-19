@@ -7,16 +7,11 @@ import (
 )
 
 func bilibili(c http.Client, url string) Result {
-	req, err := http.NewRequest("GET", url, nil)
+	resp, err := GET(c, url)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	req.Header.Add("user-agent", UA_Browser)
-
-	resp, err := c.Do(req)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
+	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: err}

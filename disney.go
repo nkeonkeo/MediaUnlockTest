@@ -21,13 +21,14 @@ func requestDisney(c http.Client, URL string, method string) Result {
 	r.Header.Set("USER-AGENT", UA_Browser)
 	r.Header.Set("authorization", "Bearer ZGlzbmV5JmJyb3dzZXImMS4wLjA.Cu56AgSfBTDag5NiRA81oLHkDZfu5L3CKadnefEAY84")
 	r.Header.Set("content-type", "application/x-www-form-urlencoded")
-	resp, err := c.Do(r)
+	resp, err := cdo(c, r)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
 	defer resp.Body.Close()
 	switch method {
 	case "auth":
+		defer resp.Body.Close()
 		b, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return Result{Success: false, Err: err}

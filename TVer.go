@@ -14,10 +14,12 @@ func TVer(c http.Client) Result {
 	req.Header.Set("User-Agent", UA_Browser)
 	req.Header.Set("Accept", "application/json;pk=BCpkADawqM0_rzsjsYbC1k1wlJLU4HiAtfzjxdUmfvvLUQB-Ax6VA-p-9wOEZbCEm3u95qq2Y1CQQW1K9tPaMma9iAqUqhpISCmyXrgnlpx9soEmoVNuQpiyGsTpePGumWxSs1YoKziYB6Wz")
 
-	resp, err := c.Do(req)
+	resp, err := cdo(c, req)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
+	defer resp.Body.Close()
+
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: err}

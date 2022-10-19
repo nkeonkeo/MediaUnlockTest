@@ -14,10 +14,12 @@ func MyTvSuper(c http.Client) Result {
 	r.Header.Set("User-Agent", UA_Browser)
 	r.Header.Set("Content-Type", "application/json")
 
-	resp, err := c.Do(r)
+	resp, err := cdo(c, r)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
+	defer resp.Body.Close()
+
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: err}

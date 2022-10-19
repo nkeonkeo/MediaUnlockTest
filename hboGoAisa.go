@@ -8,16 +8,11 @@ import (
 )
 
 func HboGoAisa(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://api2.hbogoasia.com/v1/geog?lang=undefined&version=0&bundleId=www.hbogoasia.com", nil)
+	resp, err := GET(c, "https://api2.hbogoasia.com/v1/geog?lang=undefined&version=0&bundleId=www.hbogoasia.com")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	req.Header.Add("user-agent", UA_Browser)
-
-	resp, err := c.Do(req)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
+	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: err}

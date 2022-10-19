@@ -6,26 +6,16 @@ import (
 )
 
 func Hotstar(c http.Client) Result {
-	r, err := http.NewRequest("GET", "https://api.hotstar.com/o/v1/page/1557?offset=0&size=20&tao=0&tas=20", nil)
+	resp, err := GET(c, "https://api.hotstar.com/o/v1/page/1557?offset=0&size=20&tao=0&tas=20")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	r.Header.Set("User-Agent", UA_Browser)
-
-	resp, err := c.Do(r)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
+	defer resp.Body.Close()
 	switch resp.StatusCode {
 	case 475:
 		return Result{Success: false}
 	case 401:
-		r, err := http.NewRequest("GET", "https://www.hotstar.com", nil)
-		if err != nil {
-			return Result{Success: false, Err: err}
-		}
-		r.Header.Set("User-Agent", UA_Browser)
-		resp, err := c.Do(r)
+		resp, err := GET(c, "https://www.hotstar.com")
 		if err != nil {
 			return Result{Success: false, Err: err}
 		}

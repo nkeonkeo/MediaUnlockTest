@@ -8,37 +8,28 @@ import (
 )
 
 func YoutubeRegion(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://www.youtube.com/red", nil)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
-	req.Header.Add("user-agent", UA_Browser)
-	resp, err := c.Do(req)
+	resp, err := GET(c, "https://www.youtube.com/red")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
 	defer resp.Body.Close()
-	s, err := io.ReadAll(resp.Body)
+
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	response := string(s)
-	if EndLocation := strings.Index(response, `"countryCode":`); EndLocation != -1 {
+	s := string(b)
+	if EndLocation := strings.Index(s, `"countryCode":`); EndLocation != -1 {
 		return Result{
 			Success: true,
-			Region:  strings.ToLower(response[EndLocation+15 : EndLocation+17]),
+			Region:  strings.ToLower(s[EndLocation+15 : EndLocation+17]),
 		}
 	}
 	return Result{Success: false}
 }
 
 func YoutubeCDN(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://redirector.googlevideo.com/report_mapping", nil)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
-	req.Header.Add("user-agent", UA_Browser)
-	resp, err := c.Do(req)
+	resp, err := GET(c, "https://redirector.googlevideo.com/report_mapping")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
@@ -50,7 +41,7 @@ func YoutubeCDN(c http.Client) Result {
 	s := string(b)
 	i := strings.Index(s, "=> ")
 	s = s[i+3:]
-	i = strings.Index(s, " : ")
+	i = strings.Index(s, " ")
 	s = s[:i]
 	i = strings.Index(s, "-")
 

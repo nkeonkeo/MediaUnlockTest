@@ -18,6 +18,8 @@ func NetflixRegion(c http.Client) Result {
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
+	defer resp.Body.Close()
+
 	if resp.StatusCode == 404 {
 		return Result{Success: false, Info: "Originals Only"}
 	}
@@ -52,7 +54,7 @@ func NetflixCDN(c http.Client) Result {
 			Info:    "IP Banned By Netflix",
 		}
 	}
-	// log.Println(resp.Header)
+	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: err}

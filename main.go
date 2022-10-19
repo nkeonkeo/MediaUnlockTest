@@ -53,7 +53,7 @@ func ShowResult(r Result) (s string) {
 		if r.Err != nil {
 			return FontYellow + "ERR: (" + r.Err.Error() + ")" + FontSuffix
 		} else if r.Info != "" {
-			return FontRed + " NO (" + r.Info + ")" + FontSuffix
+			return FontRed + " NO" + FontSuffix + FontYellow + " (" + r.Info + ")" + FontSuffix
 		} else {
 			return FontRed + " NO" + FontSuffix
 		}

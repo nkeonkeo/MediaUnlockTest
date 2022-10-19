@@ -6,16 +6,12 @@ import (
 )
 
 func ViuCom(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://www.viu.com", nil)
+	resp, err := GET(c, "https://www.viu.com")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	req.Header.Add("user-agent", UA_Browser)
+	defer resp.Body.Close()
 
-	resp, err := c.Do(req)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
 	if location := resp.Header.Get("location"); location != "" {
 		region := strings.Split(location, "/")[4]
 		if region == "no-service" {

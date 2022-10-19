@@ -4,23 +4,16 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"strings"
 )
 
 func Dazn(c http.Client) Result {
-	r, err := http.NewRequest("POST", "https://startup.core.indazn.com/misl/v5/Startup", strings.NewReader(
+	resp, err := PostJson(c, "https://startup.core.indazn.com/misl/v5/Startup",
 		`{"LandingPageKey":"generic","Languages":"zh-CN,zh,en","Platform":"web","PlatformAttributes":{},"Manufacturer":"","PromoCode":"","Version":"2"}`,
-	))
+	)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	r.Header.Set("User-Agent", UA_Browser)
-	r.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.Do(r)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
+	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: err}

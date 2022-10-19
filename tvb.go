@@ -8,14 +8,12 @@ import (
 )
 
 func TVBAnywhere(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://uapisfm.tvbanywhere.com.sg/geoip/check/platform/android", nil)
+	resp, err := GET(c, "https://uapisfm.tvbanywhere.com.sg/geoip/check/platform/android")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	resp, err := c.Do(req)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
+	defer resp.Body.Close()
+
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: err}

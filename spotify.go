@@ -16,10 +16,11 @@ func Spotify(c http.Client) Result {
 	}
 	req.Header.Add("Accept-Language", "en")
 	req.Header.Add("User-Agent", UA_Browser)
-	resp, err := c.Do(req)
+	resp, err := cdo(c, req)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
+	defer resp.Body.Close()
 
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {

@@ -17,6 +17,8 @@ func Telasa(c http.Client) Result {
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
+	defer resp.Body.Close()
+
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: err}

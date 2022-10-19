@@ -13,6 +13,8 @@ func KonosubaFD(c http.Client) Result {
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
+	defer resp.Body.Close()
+
 	switch resp.StatusCode {
 	case 200:
 		return Result{Success: true}

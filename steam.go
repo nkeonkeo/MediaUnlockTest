@@ -6,16 +6,11 @@ import (
 )
 
 func Steam(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://store.steampowered.com", nil)
+	resp, err := GET(c, "https://store.steampowered.com")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	req.Header.Add("user-agent", UA_Browser)
-
-	resp, err := c.Do(req)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
+	defer resp.Body.Close()
 
 	for _, c := range resp.Cookies() {
 		if c.Name == "steamCountry" {

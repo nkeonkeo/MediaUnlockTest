@@ -10,6 +10,8 @@ func J_COM_ON_DEMAND(c http.Client) Result {
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
+	defer resp.Body.Close()
+
 	switch resp.StatusCode {
 	case 403:
 		return Result{Success: false}
