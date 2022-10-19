@@ -7,12 +7,7 @@ import (
 )
 
 func KKTV(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://api.kktv.me/v3/ipcheck", nil)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
-
-	resp, err := c.Do(req)
+	resp, err := GET(c, "https://api.kktv.me/v3/ipcheck")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}

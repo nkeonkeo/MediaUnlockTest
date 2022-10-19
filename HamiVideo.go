@@ -7,12 +7,7 @@ import (
 )
 
 func HamiVideo(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://hamivideo.hinet.net/api/play.do?id=OTT_VOD_0000249064&freeProduct=1", nil)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
-
-	resp, err := c.Do(req)
+	resp, err := GET(c, "https://hamivideo.hinet.net/api/play.do?id=OTT_VOD_0000249064&freeProduct=1")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}

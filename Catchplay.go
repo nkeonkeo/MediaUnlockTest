@@ -13,7 +13,7 @@ func Catchplay(c http.Client) Result {
 	}
 	req.Header.Set("authorization", "Basic NTQ3MzM0NDgtYTU3Yi00MjU2LWE4MTEtMzdlYzNkNjJmM2E0Ok90QzR3elJRR2hLQ01sSDc2VEoy")
 
-	resp, err := c.Do(req)
+	resp, err := cdo(c, req)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}

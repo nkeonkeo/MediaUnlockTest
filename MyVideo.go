@@ -7,13 +7,8 @@ import (
 )
 
 func MyVideo(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://www.myvideo.net.tw/login.do", nil)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
 	c.CheckRedirect = nil
-
-	resp, err := c.Do(req)
+	resp, err := GET(c, "https://www.myvideo.net.tw/login.do")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
