@@ -8,7 +8,7 @@ import (
 )
 
 func NetflixRegion(c http.Client) Result {
-	resp, err := GET(c, "https://www.netflix.com/title/80018499")
+	resp, err := GET(c, "https://www.netflix.com/title/81215567")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
@@ -20,13 +20,10 @@ func NetflixRegion(c http.Client) Result {
 	if resp.StatusCode == 403 {
 		return Result{Success: false}
 	}
-	if resp.StatusCode == 200 {
-		return Result{Success: true, Region: "us"}
-	}
-	if resp.StatusCode == 301 {
+	if resp.StatusCode == 301 || resp.StatusCode == 200 {
 		u := resp.Header.Get("location")
 		if u == "" {
-			return Result{Success: false}
+			return Result{Success: true, Region: "us"}
 		}
 		t := strings.SplitN(u, "/", 5)
 		if len(t) < 5 {

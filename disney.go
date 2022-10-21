@@ -64,7 +64,7 @@ func requestDisney(c http.Client, URL string, method string) Result {
 			}
 		}
 	}
-	return Result{Success: true}
+	return Result{Success: false}
 }
 
 func DisneyPlus(c http.Client) Result {

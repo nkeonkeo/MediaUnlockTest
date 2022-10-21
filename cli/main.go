@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -18,6 +19,7 @@ import (
 
 var IPV4 = true
 var IPV6 = true
+var M, TW, HK, JP bool
 
 type result struct {
 	Name    string
@@ -25,16 +27,17 @@ type result struct {
 	Value   m.Result
 }
 
+var tot int64
 var R []*result
 var bar *pb.ProgressBar
 var wg *sync.WaitGroup
 
-func excute(Name string, F func(c http.Client) m.Result, C http.Client) {
+func excute(Name string, F func(client http.Client) m.Result, client http.Client) {
 	r := &result{Name: Name}
 	R = append(R, r)
 	wg.Add(1)
 	go func() {
-		r.Value = F(C)
+		r.Value = F(client)
 		bar.Describe(Name + " " + ShowResult(r.Value))
 		bar.Add(1)
 		wg.Done()
@@ -63,9 +66,9 @@ func ShowResult(r m.Result) (s string) {
 		if r.Err != nil {
 			return FontYellow + "ERR: (" + r.Err.Error() + ")" + FontSuffix
 		} else if r.Info != "" {
-			return FontRed + " NO" + FontSuffix + FontYellow + " (" + r.Info + ")" + FontSuffix
+			return FontRed + "NO" + FontSuffix + FontYellow + " (" + r.Info + ")" + FontSuffix
 		} else {
-			return FontRed + " NO" + FontSuffix
+			return FontRed + "NO" + FontSuffix
 		}
 	}
 	return
@@ -88,7 +91,7 @@ func ShowR() {
 		} else {
 			result := ShowResult(r.Value)
 			if r.Value.Success && strings.HasSuffix(r.Name, "CDN") {
-				result = FontSkyBlue + fmt.Sprintf("%3s", r.Value.Region) + FontSuffix
+				result = FontSkyBlue + r.Value.Region + FontSuffix
 			}
 			fmt.Printf("%-"+strconv.Itoa(NameLength)+"s %s\n", r.Name, result)
 		}
@@ -222,22 +225,18 @@ func GetIpInfo() {
 	fmt.Println("Your IPV6 address:", FontSkyBlue, s[:i], FontSuffix)
 }
 
-func main() {
-	GetIpInfo()
+func ReadSelect() {
 	fmt.Println("请选择检测项目,直接按回车将进行全部检测: ")
 	fmt.Println("[0]: 跨国平台")
 	fmt.Println("[1]: 台湾平台")
 	fmt.Println("[2]: 香港平台")
 	fmt.Println("[3]: 日本平台")
-	fmt.Print("请输入对应数字,空格分隔: 回车确认")
+	fmt.Print("请输入对应数字,空格分隔(回车确认): ")
 	r := bufio.NewReader(os.Stdin)
 	l, _, err := r.ReadLine()
 	if err != nil {
 		panic(err)
 	}
-	wg = &sync.WaitGroup{}
-	bar = NewBar(54)
-	var M, TW, HK, JP bool
 	for _, c := range strings.Split(string(l), " ") {
 		switch c {
 		case "0":
@@ -252,19 +251,58 @@ func main() {
 			M, TW, HK, JP = true, true, true, true
 		}
 	}
-	if M {
-		Multination(m.AutoHttpClient)
+}
+
+func main() {
+	client := m.AutoHttpClient
+	mode := 0
+	flag.IntVar(&mode, "m", 0, "mode 0(default)/4/6")
+	flag.Parse()
+	if mode == 4 {
+		client = m.Ipv4HttpClient
+		IPV6 = false
 	}
-	if TW {
-		Taiwan(m.AutoHttpClient)
+	if mode == 6 {
+		client = m.Ipv6HttpClient
+		IPV4 = false
+		M = true
 	}
-	if HK {
-		HongKong(m.AutoHttpClient)
+
+	GetIpInfo()
+	if IPV4 {
+		ReadSelect()
 	}
-	if JP {
-		Japan(m.AutoHttpClient)
+
+	if IPV4 && M {
+		tot += 13
 	}
-	if M && IPV6 {
+	if IPV4 && TW {
+		tot += 10
+	}
+	if IPV4 && HK {
+		tot += 5
+	}
+	if IPV4 && JP {
+		tot += 20
+	}
+	if IPV6 && M {
+		tot += 6
+	}
+	wg = &sync.WaitGroup{}
+	bar = NewBar(tot)
+	if IPV4 && M {
+		Multination(client)
+	}
+	if IPV4 && TW {
+		Taiwan(client)
+	}
+	if IPV4 && HK {
+		HongKong(client)
+	}
+	if IPV4 && JP {
+		Japan(client)
+	}
+	if IPV6 && M {
 		Ipv6Multination()
 	}
 
