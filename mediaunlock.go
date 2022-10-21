@@ -3,7 +3,6 @@ package mediaunlocktest
 import (
 	"context"
 	"errors"
-	"log"
 	"net"
 	"net/http"
 	"strings"
@@ -23,36 +22,45 @@ type Result struct {
 }
 
 var Dialer = &net.Dialer{
-	Timeout: 5 * time.Second,
+	Timeout:   30 * time.Second,
+	KeepAlive: 30 * time.Second,
 }
-var IPv4Transport = &http.Transport{
+var ipv4Transport = &http.Transport{
 	Proxy: http.ProxyFromEnvironment,
 	DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 		return Dialer.DialContext(ctx, "tcp4", addr)
 	},
-	// ForceAttemptHTTP2:     true,
-	// TLSHandshakeTimeout: 30 * time.Second,
+	ForceAttemptHTTP2:     true,
+	MaxIdleConns:          100,
+	IdleConnTimeout:       90 * time.Second,
+	TLSHandshakeTimeout:   10 * time.Second,
+	ExpectContinueTimeout: 1 * time.Second,
 }
 
 func UseLastResponse(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }
 
 var Ipv4HttpClient = http.Client{
-	Timeout:       5 * time.Second,
 	CheckRedirect: UseLastResponse,
-	Transport:     IPv4Transport,
+	Transport:     ipv4Transport,
 }
-var Ipv6Transport = &http.Transport{
+var ipv6Transport = &http.Transport{
 	Proxy: http.ProxyFromEnvironment,
 	DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 		return Dialer.DialContext(ctx, "tcp6", addr)
 	},
-	// ForceAttemptHTTP2:     true,
-	// TLSHandshakeTimeout: 10 * time.Second,
+	ForceAttemptHTTP2:     true,
+	MaxIdleConns:          100,
+	IdleConnTimeout:       90 * time.Second,
+	TLSHandshakeTimeout:   10 * time.Second,
+	ExpectContinueTimeout: 1 * time.Second,
 }
 var Ipv6HttpClient = http.Client{
-	Timeout:       5 * time.Second,
 	CheckRedirect: UseLastResponse,
-	Transport:     Ipv6Transport,
+	Transport:     ipv6Transport,
+}
+var AutoHttpClient = http.Client{
+	CheckRedirect: UseLastResponse,
+	Transport:     http.DefaultTransport,
 }
 
 func GET(c http.Client, url string) (*http.Response, error) {
@@ -60,7 +68,21 @@ func GET(c http.Client, url string) (*http.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("User-Agent", UA_Browser)
+	req.Header.Set("user-agent", UA_Browser)
+	req.Header.Set("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+	// req.Header.Set("accept-encoding", "gzip, deflate, br")
+	// req.Header.Set("accept-language", "zh-CN,zh;q=0.9")
+	req.Header.Set("cache-control", "no-cache")
+	req.Header.Set("dnt", "1")
+	req.Header.Set("pragma", "no-cache")
+	req.Header.Set("sec-ch-ua", `"Chromium";v="106", "Google Chrome";v="106", "Not;A=Brand";v="99"`)
+	req.Header.Set("sec-ch-ua-mobile", "?0")
+	req.Header.Set("sec-ch-ua-platform", "Windows")
+	req.Header.Set("sec-fetch-dest", "document")
+	req.Header.Set("sec-fetch-mode", "navigate")
+	req.Header.Set("sec-fetch-site", "none")
+	req.Header.Set("sec-fetch-user", "?1")
+	req.Header.Set("upgrade-insecure-requests", "1")
 	return cdo(c, req)
 }
 
@@ -76,12 +98,23 @@ func GET_Dalvik(c http.Client, url string) (*http.Response, error) {
 var ErrNetwork = errors.New("network error")
 
 func cdo(c http.Client, req *http.Request) (resp *http.Response, err error) {
-	for i := 0; i < 3; i++ {
+	// resp, err = c.Do(req)
+	// if err != nil {
+	// 	err = ErrNetwork
+	// }
+	// return
+	for i := 0; i < 10; i++ {
 		if resp, err = c.Do(req); err == nil {
 			return resp, nil
 		}
+		if strings.Contains(err.Error(), "no such host") {
+			break
+		}
+		if strings.Contains(err.Error(), "timeout") {
+			break
+		}
 	}
-	log.Println(err)
+	// log.Println(err)
 	return nil, ErrNetwork
 }
 func PostJson(c http.Client, url string, data string) (*http.Response, error) {
@@ -91,6 +124,20 @@ func PostJson(c http.Client, url string, data string) (*http.Response, error) {
 	}
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("user-agent", UA_Browser)
+	req.Header.Set("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+	// req.Header.Set("accept-encoding", "gzip, deflate, br")
+	// req.Header.Set("accept-language", "zh-CN,zh;q=0.9")
+	req.Header.Set("cache-control", "no-cache")
+	req.Header.Set("dnt", "1")
+	req.Header.Set("pragma", "no-cache")
+	req.Header.Set("sec-ch-ua", `"Chromium";v="106", "Google Chrome";v="106", "Not;A=Brand";v="99"`)
+	req.Header.Set("sec-ch-ua-mobile", "?0")
+	req.Header.Set("sec-ch-ua-platform", "Windows")
+	req.Header.Set("sec-fetch-dest", "document")
+	req.Header.Set("sec-fetch-mode", "navigate")
+	req.Header.Set("sec-fetch-site", "none")
+	req.Header.Set("sec-fetch-user", "?1")
+	req.Header.Set("upgrade-insecure-requests", "1")
 
 	return cdo(c, req)
 }
@@ -102,6 +149,20 @@ func PostForm(c http.Client, url string, data string) (*http.Response, error) {
 	}
 	req.Header.Set("content-type", "application/x-www-form-urlencoded")
 	req.Header.Set("user-agent", UA_Browser)
+	req.Header.Set("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+	// req.Header.Set("accept-encoding", "gzip, deflate, br")
+	// req.Header.Set("accept-language", "zh-CN,zh;q=0.9")
+	req.Header.Set("cache-control", "no-cache")
+	req.Header.Set("dnt", "1")
+	req.Header.Set("pragma", "no-cache")
+	req.Header.Set("sec-ch-ua", `"Chromium";v="106", "Google Chrome";v="106", "Not;A=Brand";v="99"`)
+	req.Header.Set("sec-ch-ua-mobile", "?0")
+	req.Header.Set("sec-ch-ua-platform", "Windows")
+	req.Header.Set("sec-fetch-dest", "document")
+	req.Header.Set("sec-fetch-mode", "navigate")
+	req.Header.Set("sec-fetch-site", "none")
+	req.Header.Set("sec-fetch-user", "?1")
+	req.Header.Set("upgrade-insecure-requests", "1")
 
 	return cdo(c, req)
 }

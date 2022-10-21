@@ -4,20 +4,12 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"strings"
 )
 
 func NowE(c http.Client) Result {
-	r, err := http.NewRequest("POST", "https://webtvapi.nowe.com/16/1/getVodURL", strings.NewReader(
+	resp,err:=PostJson(c,"https://webtvapi.nowe.com/16/1/getVodURL", 
 		`{"contentId":"202105121370235","contentType":"Vod","pin":"","deviceId":"W-60b8d30a-9294-d251-617b-c12f9d0c","deviceType":"WEB"}`,
-	))
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
-	r.Header.Set("User-Agent", UA_Browser)
-	r.Header.Set("Content-Type", "application/json")
-
-	resp, err := c.Do(r)
+	)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}

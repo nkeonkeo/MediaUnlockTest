@@ -13,8 +13,8 @@ func Paravi(c http.Client) Result {
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-
 	defer resp.Body.Close()
+
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: err}
@@ -33,5 +33,5 @@ func Paravi(c http.Client) Result {
 	if res.Error.Type == "Unauthorized" {
 		return Result{Success: true}
 	}
-	return Result{Success: false, Info: "failed"}
+	return Result{Success: false, Info: "unknown"}
 }

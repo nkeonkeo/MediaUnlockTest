@@ -7,6 +7,7 @@ import (
 )
 
 func PrimeVideo(c http.Client) Result {
+	c.CheckRedirect = nil
 	resp, err := GET(c, "https://www.primevideo.com")
 	if err != nil {
 		return Result{Success: false, Err: err}

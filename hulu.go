@@ -18,9 +18,8 @@ func HuluJP(c http.Client) Result {
 		return Result{Success: false, Err: err}
 	}
 	req.Header.Set("user-agent", UA_Browser)
-	req.Header.Set("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+	// req.Header.Set("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
 	req.Header.Set("accept-encoding", "gzip, deflate, br")
-	req.Header.Set("accept-language", "zh-CN,zh;q=0.9")
 	req.Header.Set("cache-control", "no-cache")
 	req.Header.Set("dnt", "1")
 	req.Header.Set("pragma", "no-cache")

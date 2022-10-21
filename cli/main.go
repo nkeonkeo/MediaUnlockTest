@@ -1,25 +1,33 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
 	"sync"
+	"time"
 
 	m "MediaUnlockTest"
 
-	"github.com/schollz/progressbar/v3"
+	pb "github.com/schollz/progressbar/v3"
 )
 
+var IPV4 = true
+var IPV6 = true
+
 type result struct {
-	Name  string
-	Value m.Result
+	Name    string
+	Divider bool
+	Value   m.Result
 }
 
-var R = []*result{}
-
-var bar *progressbar.ProgressBar
-var wg = &sync.WaitGroup{}
+var R []*result
+var bar *pb.ProgressBar
+var wg *sync.WaitGroup
 
 func excute(Name string, F func(c http.Client) m.Result, C http.Client) {
 	r := &result{Name: Name}
@@ -48,7 +56,7 @@ func ShowResult(r m.Result) (s string) {
 	if r.Success {
 		s = FontGreen + "YES"
 		if r.Region != "" {
-			s += " (Region: " + r.Region + ")"
+			s += " (region: " + r.Region + ")"
 		}
 		s += FontSuffix
 	} else {
@@ -63,75 +71,204 @@ func ShowResult(r m.Result) (s string) {
 	return
 }
 
-func main() {
-	// log.Println(Abema(Ipv4HttpClient))
-	// return
-	bar = progressbar.Default(48, "testing ...")
-
-	excute("Dazn", m.Dazn, m.Ipv4HttpClient)
-	excute("Hotstar", m.Hotstar, m.Ipv4HttpClient)
-	excute("Disney+", m.DisneyPlus, m.Ipv4HttpClient)
-	excute("Netflix", m.NetflixRegion, m.Ipv4HttpClient)
-	excute("Netflix CDN", m.NetflixCDN, m.Ipv4HttpClient)
-	excute("Youtube", m.YoutubeRegion, m.Ipv4HttpClient)
-	excute("Youtube CDN", m.YoutubeCDN, m.Ipv4HttpClient)
-	excute("Prime Video", m.PrimeVideo, m.Ipv4HttpClient)
-	excute("TVBAnywhere+", m.TVBAnywhere, m.Ipv4HttpClient)
-	excute("iQyi Region", m.IqRegion, m.Ipv4HttpClient)
-	excute("Viu.com", m.ViuCom, m.Ipv4HttpClient)
-	excute("Spotify", m.Spotify, m.Ipv4HttpClient)
-	excute("Steam", m.Steam, m.Ipv4HttpClient)
-
-	excute("Viu.TV", m.ViuTV, m.Ipv4HttpClient)
-	excute("Now E", m.NowE, m.Ipv4HttpClient)
-	excute("MyTVSuper", m.MyTvSuper, m.Ipv4HttpClient)
-	excute("HBO GO Aisa", m.HboGoAisa, m.Ipv4HttpClient)
-	excute("BiliBili Hongkong/Macau/Taiwan", m.BilibiliHKMCTW, m.Ipv4HttpClient)
-
-	excute("KKTV", m.KKTV, m.Ipv4HttpClient)
-	excute("LiTV", m.LiTV, m.Ipv4HttpClient)
-	excute("MyVideo", m.MyVideo, m.Ipv4HttpClient)
-	excute("TW4GTV", m.TW4GTV, m.Ipv4HttpClient)
-	excute("LineTV", m.LineTV, m.Ipv4HttpClient)
-	excute("HamiVideo", m.HamiVideo, m.Ipv4HttpClient)
-	excute("Catchplay+", m.Catchplay, m.Ipv4HttpClient)
-	excute("Bahamu Anime", m.BahamuAnime, m.Ipv4HttpClient)
-	excute("HBO GO Aisa", m.HboGoAisa, m.Ipv4HttpClient)
-	excute("Bilibili Taiwan Only", m.BilibiliTW, m.Ipv4HttpClient)
-
-	excute("DMM", m.DMM, m.Ipv4HttpClient)
-	excute("Abema", m.Abema, m.Ipv4HttpClient)
-	excute("Niconico", m.Niconico, m.Ipv4HttpClient)
-	excute("music.jp", m.MusicJP, m.Ipv4HttpClient)
-	excute("Telasa", m.Telasa, m.Ipv4HttpClient)
-	excute("Paravi", m.Paravi, m.Ipv4HttpClient)
-	excute("U-NEXT", m.U_NEXT, m.Ipv4HttpClient)
-	excute("Hulu Japan", m.HuluJP, m.Ipv4HttpClient)
-	excute("GYAO!", m.GYAO, m.Ipv4HttpClient)
-	excute("VideoMarket", m.VideoMarket, m.Ipv4HttpClient)
-	excute("FOD(Fuji TV)", m.FOD, m.Ipv4HttpClient)
-	excute("Radiko", m.Radiko, m.Ipv4HttpClient)
-	excute("Karaoke@DAM", m.Karaoke, m.Ipv4HttpClient)
-	excute("J:COM On Demand", m.J_COM_ON_DEMAND, m.Ipv4HttpClient)
-	excute("Kancolle", m.Kancolle, m.Ipv4HttpClient)
-	excute("Pretty Derby Japan", m.PrettyDerbyJP, m.Ipv4HttpClient)
-	excute("Konosuba Fantastic Days", m.KonosubaFD, m.Ipv4HttpClient)
-	excute("Princess Connect Re:Dive Japan", m.PCRJP, m.Ipv4HttpClient)
-	excute("World Flipper Japan", m.WFJP, m.Ipv4HttpClient)
-	excute("Project Sekai: Colorful Stage", m.PJSK, m.Ipv4HttpClient)
-
-	wg.Wait()
-	bar.Describe("Finished")
-	bar.Clear()
-	bar.Finish()
-
-	NameLength := 0
+func ShowR() {
+	NameLength := 25
 	for _, r := range R {
 		if len(r.Name) > NameLength {
 			NameLength = len(r.Name)
 		}
 	}
 	for _, r := range R {
-		fmt.Printf("%-"+strconv.Itoa(NameLength)+"s %s\n", r.Name, ShowResult(r.Value))
+		if r.Divider {
+			s := "[ " + r.Name + " ] "
+			for i := NameLength - len(s) + 4; i > 0; i-- {
+				s += "="
+			}
+			fmt.Println(s)
+		} else {
+			result := ShowResult(r.Value)
+			if r.Value.Success && strings.HasSuffix(r.Name, "CDN") {
+				result = FontSkyBlue + fmt.Sprintf("%3s", r.Value.Region) + FontSuffix
+			}
+			fmt.Printf("%-"+strconv.Itoa(NameLength)+"s %s\n", r.Name, result)
+		}
 	}
+}
+
+func NewBar(count int64) *pb.ProgressBar {
+	return pb.NewOptions64(
+		count,
+		pb.OptionSetDescription("testing"),
+		pb.OptionSetWriter(os.Stderr),
+		pb.OptionSetWidth(20),
+		pb.OptionThrottle(100*time.Millisecond),
+		pb.OptionShowCount(),
+		pb.OptionClearOnFinish(),
+		pb.OptionEnableColorCodes(true),
+		// pb.OptionOnCompletion(func() { bar.Clear() }),
+		pb.OptionSpinnerType(14),
+		// pb.OptionSetRenderBlankState(true),
+	)
+}
+
+func Multination(c http.Client) {
+	R = append(R, &result{Name: "Multination", Divider: true})
+	excute("Dazn", m.Dazn, c)
+	excute("Hotstar", m.Hotstar, c)
+	excute("Disney+", m.DisneyPlus, c)
+	excute("Netflix", m.NetflixRegion, c)
+	excute("Netflix CDN", m.NetflixCDN, c)
+	excute("Youtube", m.YoutubeRegion, c)
+	excute("Youtube CDN", m.YoutubeCDN, c)
+	excute("Amazon Prime Video", m.PrimeVideo, c)
+	excute("TVBAnywhere+", m.TVBAnywhere, c)
+	excute("iQyi", m.IqRegion, c)
+	excute("Viu.com", m.ViuCom, c)
+	excute("Spotify", m.Spotify, c)
+	excute("Steam", m.Steam, c)
+}
+
+func HongKong(c http.Client) {
+	R = append(R, &result{Name: "Hong Kong", Divider: true})
+	excute("Now E", m.NowE, c)
+	excute("Viu.TV", m.ViuTV, c)
+	excute("MyTVSuper", m.MyTvSuper, c)
+	excute("HBO GO Aisa", m.HboGoAisa, c)
+	excute("BiliBili Hongkong/Macau/Taiwan", m.BilibiliHKMCTW, c)
+}
+
+func Taiwan(c http.Client) {
+	R = append(R, &result{Name: "Taiwan", Divider: true})
+	excute("KKTV", m.KKTV, c)
+	excute("LiTV", m.LiTV, c)
+	excute("MyVideo", m.MyVideo, c)
+	excute("4GTV", m.TW4GTV, c)
+	excute("LineTV", m.LineTV, c)
+	excute("Hami Video", m.HamiVideo, c)
+	excute("CatchPlay+", m.Catchplay, c)
+	excute("Bahamu Anime", m.BahamuAnime, c)
+	excute("HBO GO Aisa", m.HboGoAisa, c)
+	excute("Bilibili Taiwan Only", m.BilibiliTW, c)
+}
+
+func Japan(c http.Client) {
+	R = append(R, &result{Name: "Japan", Divider: true})
+	excute("DMM", m.DMM, c)
+	excute("Abema", m.Abema, c)
+	excute("Niconico", m.Niconico, c)
+	excute("music.jp", m.MusicJP, c)
+	excute("Telasa", m.Telasa, c)
+	excute("Paravi", m.Paravi, c)
+	excute("U-NEXT", m.U_NEXT, c)
+	excute("Hulu Japan", m.HuluJP, c)
+	excute("GYAO!", m.GYAO, c)
+	excute("VideoMarket", m.VideoMarket, c)
+	excute("FOD(Fuji TV)", m.FOD, c)
+	excute("Radiko", m.Radiko, c)
+	excute("Karaoke@DAM", m.Karaoke, c)
+	excute("J:COM On Demand", m.J_COM_ON_DEMAND, c)
+	excute("Kancolle", m.Kancolle, c)
+	excute("Pretty Derby Japan", m.PrettyDerbyJP, c)
+	excute("Konosuba Fantastic Days", m.KonosubaFD, c)
+	excute("Princess Connect Re:Dive Japan", m.PCRJP, c)
+	excute("World Flipper Japan", m.WFJP, c)
+	excute("Project Sekai: Colorful Stage", m.PJSK, c)
+}
+
+func Ipv6Multination() {
+	c := m.Ipv6HttpClient
+	R = append(R, &result{Name: "IPV6 Multination", Divider: true})
+	excute("Hotstar", m.Hotstar, c)
+	excute("Disney+", m.DisneyPlus, c)
+	excute("Netflix", m.NetflixRegion, c)
+	excute("Netflix CDN", m.NetflixCDN, c)
+	excute("Youtube", m.YoutubeRegion, c)
+	excute("Youtube CDN", m.YoutubeCDN, c)
+}
+
+func GetIpInfo() {
+	resp, err := m.Ipv4HttpClient.Get("https://www.cloudflare.com/cdn-cgi/trace")
+	if err != nil {
+		IPV4 = false
+		fmt.Println("unsupport ipv4")
+		return
+	}
+	defer resp.Body.Close()
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		IPV4 = false
+		fmt.Println("unsupport ipv4")
+	}
+	s := string(b)
+	i := strings.Index(s, "ip=")
+	s = s[i+3:]
+	i = strings.Index(s, "\n")
+	fmt.Println("Your IPV4 address:", FontSkyBlue, s[:i], FontSuffix)
+	resp, err = m.Ipv6HttpClient.Get("https://www.cloudflare.com/cdn-cgi/trace")
+	if err != nil {
+		IPV6 = false
+		fmt.Println("unsupport ipv6")
+		return
+	}
+	defer resp.Body.Close()
+	b, err = io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("unsupport ipv6")
+	}
+	s = string(b)
+	i = strings.Index(s, "ip=")
+	s = s[i+3:]
+	i = strings.Index(s, "\n")
+	fmt.Println("Your IPV6 address:", FontSkyBlue, s[:i], FontSuffix)
+}
+
+func main() {
+	GetIpInfo()
+	fmt.Println("请选择检测项目,直接按回车将进行全部检测: ")
+	fmt.Println("[0]: 跨国平台")
+	fmt.Println("[1]: 台湾平台")
+	fmt.Println("[2]: 香港平台")
+	fmt.Println("[3]: 日本平台")
+	fmt.Print("请输入对应数字,空格分隔: 回车确认")
+	r := bufio.NewReader(os.Stdin)
+	l, _, err := r.ReadLine()
+	if err != nil {
+		panic(err)
+	}
+	wg = &sync.WaitGroup{}
+	bar = NewBar(54)
+	var M, TW, HK, JP bool
+	for _, c := range strings.Split(string(l), " ") {
+		switch c {
+		case "0":
+			M = true
+		case "1":
+			TW = true
+		case "2":
+			HK = true
+		case "3":
+			JP = true
+		default:
+			M, TW, HK, JP = true, true, true, true
+		}
+	}
+	if M {
+		Multination(m.AutoHttpClient)
+	}
+	if TW {
+		Taiwan(m.AutoHttpClient)
+	}
+	if HK {
+		HongKong(m.AutoHttpClient)
+	}
+	if JP {
+		Japan(m.AutoHttpClient)
+	}
+	if M && IPV6 {
+		Ipv6Multination()
+	}
+
+	wg.Wait()
+	bar.Finish()
+	ShowR()
 }

@@ -1,6 +1,8 @@
 package mediaunlocktest
 
-import "net/http"
+import (
+	"net/http"
+)
 
 func PrettyDerbyJP(c http.Client) Result {
 	for i := 0; i < 3; i++ {

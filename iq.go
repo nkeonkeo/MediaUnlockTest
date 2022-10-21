@@ -6,12 +6,7 @@ import (
 )
 
 func IqRegion(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://www.iq.com", nil)
-	if err != nil {
-		return Result{Success: false, Err: err}
-	}
-	req.Header.Add("user-agent", UA_Browser)
-	resp, err := c.Do(req)
+	resp, err := GET(c, "https://www.iq.com")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
