@@ -4,19 +4,19 @@
 
 使用方法: 
 
-```
+```bash
 bash <(curl -Ls unlock.moe)
 ```
 
 只检测IPv4结果:
 
-```
+```bash
 bash <(curl -Ls unlock.moe) -m 4
 ```
 
 只检测IPv6结果：
 
-```
+```bash
 bash <(curl -Ls unlock.moe) -m 6
 ```
 
