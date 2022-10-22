@@ -33,9 +33,13 @@ func requestDisney(c http.Client, URL string, method string) Result {
 		if err != nil {
 			return Result{Success: false, Err: err}
 		}
-		// log.Println(string(b))
-		if strings.Contains(string(b), "unauthorized") {
+		s := string(b)
+		// log.Println(s)
+		if strings.Contains(s, "unauthorized") {
 			return Result{Success: false, Err: errors.New("unauthorized")}
+		}
+		if strings.Contains(s, "403 ERROR") || strings.Contains(s, "forbidden-location") {
+			return Result{Success: false}
 		}
 		return Result{Success: true}
 	case "query":
@@ -69,11 +73,11 @@ func requestDisney(c http.Client, URL string, method string) Result {
 
 func DisneyPlus(c http.Client) Result {
 	QueryResult := requestDisney(c, "https://www.disneyplus.com", "query")
-	if QueryResult.Err != nil {
+	if !QueryResult.Success {
 		return QueryResult
 	}
-	VerifyResult := requestDisney(Ipv4HttpClient, "https://global.edge.bamgrid.com/token", "auth")
-	if VerifyResult.Err != nil {
+	VerifyResult := requestDisney(AutoHttpClient, "https://global.edge.bamgrid.com/token", "auth")
+	if !VerifyResult.Success {
 		return VerifyResult
 	}
 	return QueryResult
