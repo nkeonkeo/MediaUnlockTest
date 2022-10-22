@@ -25,6 +25,8 @@ bash <(curl -Ls unlock.moe) -m 6
 - 补充对北美、南美、欧洲等地区的解锁检测
 - 修复已经存在/可能存在的问题
 
+欢迎提交你的 pull requests
+
 ## 二次开发
 
 ```golang
