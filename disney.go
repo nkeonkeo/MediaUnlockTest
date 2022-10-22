@@ -18,7 +18,7 @@ func requestDisney(c http.Client, URL string, method string) Result {
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
-	r.Header.Set("USER-AGENT", UA_Browser)
+	r.Header.Set("user-agent", UA_Browser)
 	r.Header.Set("authorization", "Bearer ZGlzbmV5JmJyb3dzZXImMS4wLjA.Cu56AgSfBTDag5NiRA81oLHkDZfu5L3CKadnefEAY84")
 	r.Header.Set("content-type", "application/x-www-form-urlencoded")
 	resp, err := cdo(c, r)
@@ -33,7 +33,7 @@ func requestDisney(c http.Client, URL string, method string) Result {
 		if err != nil {
 			return Result{Success: false, Err: err}
 		}
-		// log.Println(string(s))
+		// log.Println(string(b))
 		if strings.Contains(string(b), "unauthorized") {
 			return Result{Success: false, Err: errors.New("unauthorized")}
 		}

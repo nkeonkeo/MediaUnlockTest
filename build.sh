@@ -3,12 +3,14 @@
 cd cli
 tp="-gcflags=-trimpath="$GOPATH" -asmflags=-trimpath="$GOPATH
 flags="-w -s -X 'main.buildTime=$(date '+%Y-%m-%d %H:%M:%S')'"
+
+# exit
+
 echo "build linux amd64 ..."
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="$flags" $tp -o build/unlock-test_linux_amd64
+
 echo "build linux arm64 ..."
 CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="$flags" $tp -o build/unlock-test_linux_arm64
-
-exit
 
 echo "build darwin amd64 ..."
 CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="$flags" $tp -o build/unlock-test_darwin_amd64

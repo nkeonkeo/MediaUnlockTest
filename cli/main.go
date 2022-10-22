@@ -5,8 +5,10 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -75,6 +77,7 @@ func ShowResult(r m.Result) (s string) {
 }
 
 func ShowR() {
+	fmt.Println("测试时间: ", FontYellow+time.Now().Format("2006-01-02 15:04:05")+FontSuffix)
 	NameLength := 25
 	for _, r := range R {
 		if len(r.Name) > NameLength {
@@ -108,9 +111,7 @@ func NewBar(count int64) *pb.ProgressBar {
 		pb.OptionShowCount(),
 		pb.OptionClearOnFinish(),
 		pb.OptionEnableColorCodes(true),
-		// pb.OptionOnCompletion(func() { bar.Clear() }),
 		pb.OptionSpinnerType(14),
-		// pb.OptionSetRenderBlankState(true),
 	)
 }
 
@@ -235,7 +236,8 @@ func ReadSelect() {
 	r := bufio.NewReader(os.Stdin)
 	l, _, err := r.ReadLine()
 	if err != nil {
-		panic(err)
+		M, TW, HK, JP = true, true, true, true
+		return
 	}
 	for _, c := range strings.Split(string(l), " ") {
 		switch c {
@@ -253,11 +255,134 @@ func ReadSelect() {
 	}
 }
 
+type Downloader struct {
+	io.Reader
+	Total   uint64
+	Current uint64
+	Pb      *pb.ProgressBar
+	done    bool
+}
+
+func (d *Downloader) Read(p []byte) (n int, err error) {
+	n, err = d.Reader.Read(p)
+	d.Current += uint64(n)
+	if d.done {
+		return
+	}
+	d.Pb.Add(n)
+	// fmt.Printf("\r正在下载，进度：%.2f%% [%s/%s]", float64(d.Current*10000/d.Total)/100, humanize.Bytes(d.Current), humanize.Bytes(d.Total))
+	if d.Current == d.Total {
+		d.done = true
+		d.Pb.Describe("unlock-test下载完成")
+		d.Pb.Finish()
+	}
+	return
+}
+
+func checkUpdate() {
+	resp, err := http.Get("https://unlock.moe/latest/version")
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	version := string(b)
+	if version == m.Version {
+		fmt.Println("已经是最新版本")
+		return
+	}
+	fmt.Println("检测到新版本", version)
+	OS, ARCH := runtime.GOOS, runtime.GOARCH
+	fmt.Println("OS:", OS)
+	fmt.Println("ARCH:", ARCH)
+	out, err := os.Create("/usr/bin/unlock-test_new")
+	if err != nil {
+		log.Fatal("[ERR] 创建文件出错:", err)
+		return
+	}
+	defer out.Close()
+	log.Println("下载unlock-test中 ...")
+	url := "https://unlock.moe/latest/unlock-test_" + runtime.GOOS + "_" + runtime.GOARCH
+	resp, err = http.Get(url)
+	if err != nil {
+		log.Fatal("[ERR] 下载unlock-test时出错:", err)
+	}
+	defer resp.Body.Close()
+	downloader := &Downloader{
+		Reader: resp.Body,
+		Total:  uint64(resp.ContentLength),
+		Pb:     pb.DefaultBytes(resp.ContentLength, "下载进度"),
+	}
+	if _, err := io.Copy(out, downloader); err != nil {
+		log.Fatal("[ERR] 下载unlock-test时出错:", err)
+	}
+	if os.Chmod("/usr/bin/unlock-test_new", 0777) != nil {
+		log.Fatal("[ERR] 更改unlock-test后端权限出错:", err)
+	}
+	if _, err := os.Stat("/usr/bin/unlock-test"); err == nil {
+		if os.Remove("/usr/bin/unlock-test") != nil {
+			log.Fatal("[ERR] 删除unlock-test旧版本时出错:", err.Error())
+		}
+	}
+	if os.Rename("/usr/bin/unlock-test_new", "/usr/bin/unlock-test") != nil {
+		log.Fatal("[ERR] 更新unlock-test后端时出错:", err)
+	}
+	log.Println("[OK] unlock-test后端更新成功")
+}
+
+func showCounts() {
+	resp, err := http.Get("https://unlock.moe/count.php")
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	s := strings.Split(string(b), " ")
+	d, m, t := s[0], s[1], s[3]
+	fmt.Printf("当天运行共%s次, 本月运行共%s次, 共计运行%s次\n", FontSkyBlue+d+FontSuffix, FontYellow+m+FontSuffix, FontGreen+t+FontSuffix)
+}
+
+func showAd() {
+	resp, err := http.Get("https://unlock.moe/ad")
+	if err != nil {
+		return
+	}
+	defer resp.Body.Close()
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return
+	}
+	fmt.Println(string(b))
+}
+
 func main() {
+	// m.DisneyPlus(m.AutoHttpClient)
+	// return
 	client := m.AutoHttpClient
 	mode := 0
+	showVersion := false
+	update := false
 	flag.IntVar(&mode, "m", 0, "mode 0(default)/4/6")
+	flag.BoolVar(&showVersion, "v", false, "show version")
+	flag.BoolVar(&update, "u", false, "update")
 	flag.Parse()
+	if showVersion {
+		fmt.Println(m.Version)
+		return
+	}
+	if update {
+		checkUpdate()
+		return
+	}
 	if mode == 4 {
 		client = m.Ipv4HttpClient
 		IPV6 = false
@@ -267,6 +392,10 @@ func main() {
 		IPV4 = false
 		M = true
 	}
+
+	fmt.Println("项目地址: " + FontSkyBlue + "https://github.com/nkeonkeo/MediaUnlockTest" + FontSuffix)
+	fmt.Println("使用方式: " + FontYellow + "curl -Ls unlock.moe | sh" + FontSuffix)
+	fmt.Println()
 
 	GetIpInfo()
 	if IPV4 {
@@ -308,5 +437,11 @@ func main() {
 
 	wg.Wait()
 	bar.Finish()
+	fmt.Println()
 	ShowR()
+	fmt.Println()
+	fmt.Println("检测完毕，感谢您的使用!")
+	showCounts()
+	fmt.Println()
+	showAd()
 }
