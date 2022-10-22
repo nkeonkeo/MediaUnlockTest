@@ -27,7 +27,7 @@ bash <(curl -Ls unlock.moe) -m 6
 
 ## 二次开发
 
-```
+```golang
 import "https://github.com/nkeonkeo/MediaUnlockTest"
 ```
 
