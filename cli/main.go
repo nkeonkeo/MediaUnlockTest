@@ -138,7 +138,7 @@ func HongKong(c http.Client) {
 	excute("Viu.TV", m.ViuTV, c)
 	excute("MyTVSuper", m.MyTvSuper, c)
 	excute("HBO GO Aisa", m.HboGoAisa, c)
-	excute("BiliBili Hongkong/Macau/Taiwan", m.BilibiliHKMCTW, c)
+	excute("BiliBili Hongkong/Macau Only", m.BilibiliHKMC, c)
 }
 
 func Taiwan(c http.Client) {
