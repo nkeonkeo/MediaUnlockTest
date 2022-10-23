@@ -138,7 +138,7 @@ func HongKong(c http.Client) {
 	excute("Viu.TV", m.ViuTV, c)
 	excute("MyTVSuper", m.MyTvSuper, c)
 	excute("HBO GO Aisa", m.HboGoAisa, c)
-	excute("BiliBili Hongkong/Macau/Taiwan", m.BilibiliHKMCTW, c)
+	excute("BiliBili Hongkong/Macau Only", m.BilibiliHKMC, c)
 }
 
 func Taiwan(c http.Client) {
@@ -150,7 +150,7 @@ func Taiwan(c http.Client) {
 	excute("LineTV", m.LineTV, c)
 	excute("Hami Video", m.HamiVideo, c)
 	excute("CatchPlay+", m.Catchplay, c)
-	excute("Bahamu Anime", m.BahamuAnime, c)
+	excute("Bahamut Anime", m.BahamutAnime, c)
 	excute("HBO GO Aisa", m.HboGoAisa, c)
 	excute("Bilibili Taiwan Only", m.BilibiliTW, c)
 }
@@ -194,14 +194,14 @@ func GetIpInfo() {
 	resp, err := m.Ipv4HttpClient.Get("https://www.cloudflare.com/cdn-cgi/trace")
 	if err != nil {
 		IPV4 = false
-		fmt.Println("unsupport ipv4")
+		fmt.Println("No IPv4 support")
 		return
 	}
 	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		IPV4 = false
-		fmt.Println("unsupport ipv4")
+		fmt.Println("No IPv4 support")
 	}
 	s := string(b)
 	i := strings.Index(s, "ip=")
@@ -211,13 +211,13 @@ func GetIpInfo() {
 	resp, err = m.Ipv6HttpClient.Get("https://www.cloudflare.com/cdn-cgi/trace")
 	if err != nil {
 		IPV6 = false
-		fmt.Println("unsupport ipv6")
+		fmt.Println("No IPv6 support")
 		return
 	}
 	defer resp.Body.Close()
 	b, err = io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("unsupport ipv6")
+		fmt.Println("No IPv6 support")
 	}
 	s = string(b)
 	i = strings.Index(s, "ip=")

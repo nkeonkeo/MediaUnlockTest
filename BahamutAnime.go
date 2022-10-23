@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func BahamuAnime(c http.Client) Result {
+func BahamutAnime(c http.Client) Result {
 	resp, err := GET(c, "https://ani.gamer.com.tw/ajax/token.php?adID=89422&sn=14667")
 	if err != nil {
 		return Result{Success: false, Err: err}
