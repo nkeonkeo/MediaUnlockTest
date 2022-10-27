@@ -9,7 +9,7 @@ func KonosubaFD(c http.Client) Result {
 	}
 	req.Header.Set("User-Agent", "pj0007/212 CFNetwork/1240.0.4 Darwin/20.6.0")
 
-	resp, err := c.Do(req)
+	resp, err := cdo(c, req)
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}
