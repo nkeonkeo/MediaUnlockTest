@@ -191,7 +191,7 @@ func Ipv6Multination() {
 }
 
 func GetIpInfo() {
-	resp, err := m.Ipv4HttpClient.Get("https://www.cloudflare.com/cdn-cgi/trace")
+	resp, err := m.Ipv4HttpClient.Get("https://api.myip.la")
 	if err != nil {
 		IPV4 = false
 		fmt.Println("No IPv4 support")
@@ -204,11 +204,8 @@ func GetIpInfo() {
 		fmt.Println("No IPv4 support")
 	}
 	s := string(b)
-	i := strings.Index(s, "ip=")
-	s = s[i+3:]
-	i = strings.Index(s, "\n")
-	fmt.Println("Your IPV4 address:", FontSkyBlue, s[:i], FontSuffix)
-	resp, err = m.Ipv6HttpClient.Get("https://www.cloudflare.com/cdn-cgi/trace")
+	fmt.Println("Your IPV4 address:", FontSkyBlue, s, FontSuffix)
+	resp, err = m.Ipv6HttpClient.Get("https://api.myip.la")
 	if err != nil {
 		IPV6 = false
 		fmt.Println("No IPv6 support")
@@ -220,10 +217,7 @@ func GetIpInfo() {
 		fmt.Println("No IPv6 support")
 	}
 	s = string(b)
-	i = strings.Index(s, "ip=")
-	s = s[i+3:]
-	i = strings.Index(s, "\n")
-	fmt.Println("Your IPV6 address:", FontSkyBlue, s[:i], FontSuffix)
+	fmt.Println("Your IPV6 address:", FontSkyBlue, s, FontSuffix)
 }
 
 func ReadSelect() {
