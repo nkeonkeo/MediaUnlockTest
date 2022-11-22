@@ -19,11 +19,17 @@ func YoutubeRegion(c http.Client) Result {
 		return Result{Success: false, Err: err}
 	}
 	s := string(b)
+	if strings.Contains(s, "Premium is not available in your country") {
+		return Result{Success: false}
+	}
 	if EndLocation := strings.Index(s, `"countryCode":`); EndLocation != -1 {
 		return Result{
 			Success: true,
 			Region:  strings.ToLower(s[EndLocation+15 : EndLocation+17]),
 		}
+	}
+	if strings.Contains(s, "manageSubscriptionButton") {
+		return Result{Success: true}
 	}
 	return Result{Success: false}
 }

@@ -42,3 +42,7 @@ func HuluJP(c http.Client) Result {
 	}
 	return Result{Success: true}
 }
+
+func Hulu(c http.Client) Result {
+	
+}
