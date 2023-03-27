@@ -41,4 +41,4 @@ import "https://github.com/nkeonkeo/MediaUnlockTest"
 
 本项目基于 [lmc的全能检测脚本](https://github.com/lmc999/RegionRestrictionCheck) 的思路使用golang重构，提供更快的检测速度
 
-Powered By [Neko Neko Cloud](https://nekoneko.cloud)
+Powered By [NNC](https://nnc.sh)
