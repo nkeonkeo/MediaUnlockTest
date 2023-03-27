@@ -23,7 +23,7 @@ type Result struct {
 }
 
 var Dialer = &net.Dialer{
-	Timeout:   30 * time.Second,
+	Timeout:   5 * time.Second,
 	KeepAlive: 30 * time.Second,
 }
 var ipv4Transport = &http.Transport{
@@ -64,7 +64,9 @@ var AutoHttpClient = http.Client{
 	Transport:     http.DefaultTransport,
 }
 
-func GET(c http.Client, url string) (*http.Response, error) {
+type H [2]string
+
+func GET(c http.Client, url string, headers ...H) (*http.Response, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -84,6 +86,9 @@ func GET(c http.Client, url string) (*http.Response, error) {
 	req.Header.Set("sec-fetch-site", "none")
 	req.Header.Set("sec-fetch-user", "?1")
 	req.Header.Set("upgrade-insecure-requests", "1")
+	for _, h := range headers {
+		req.Header.Set(h[0], h[1])
+	}
 	return cdo(c, req)
 }
 

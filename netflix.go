@@ -8,7 +8,10 @@ import (
 )
 
 func NetflixRegion(c http.Client) Result {
-	resp, err := GET(c, "https://www.netflix.com/title/81215567")
+	// 70143836 绝命毒师
+	// 80018499 test
+	// 81280792 乐高
+	resp, err := GET(c, "https://www.netflix.com/title/81280792")
 	if err != nil {
 		return Result{Success: false, Err: err}
 	}

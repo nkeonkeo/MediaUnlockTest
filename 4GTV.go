@@ -22,7 +22,7 @@ func TW4GTV(c http.Client) Result {
 		Success bool
 	}
 	if err := json.Unmarshal(b, &res); err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Success: false}
 	}
 	if res.Success {
 		return Result{Success: true}

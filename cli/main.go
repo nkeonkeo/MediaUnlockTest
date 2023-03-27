@@ -130,6 +130,7 @@ func Multination(c http.Client) {
 	excute("Viu.com", m.ViuCom, c)
 	excute("Spotify", m.Spotify, c)
 	excute("Steam", m.Steam, c)
+	excute("ChatGPT", m.ChatGPT, c)
 }
 
 func HongKong(c http.Client) {
@@ -177,6 +178,44 @@ func Japan(c http.Client) {
 	excute("Princess Connect Re:Dive Japan", m.PCRJP, c)
 	excute("World Flipper Japan", m.WFJP, c)
 	excute("Project Sekai: Colorful Stage", m.PJSK, c)
+}
+
+func NorthAmerica(c http.Client) {
+	R = append(R, &result{Name: "North America", Divider: true})
+	excute("FOX", m.Fox, c)
+	excute("Hulu", m.Hulu, c)
+	excute("ESPN+", m.ESPNPlus, c)
+	excute("Epix", m.Epix, c)
+	excute("Starz", m.Starz, c)
+	excute("Philo", m.Philo, c)
+	excute("FXNOW", m.FXNOW, c)
+	excute("TLC GO", m.TlcGo, c)
+	excute("HBO Max", m.HBOMax, c)
+	excute("Shudder", m.Shudder, c)
+	excute("BritBox", m.BritBox, c)
+	excute("CW TV", m.CW_TV, c)
+	excute("NBA TV", m.NBA_TV, c)
+	excute("Fubo TV", m.FuboTV, c)
+	excute("Tubi TV", m.TubiTV, c)
+	excute("Sling TV", m.SlingTV, c)
+	excute("Pluto TV", m.PlutoTV, c)
+	excute("Acorn TV", m.AcornTV, c)
+	excute("SHOWTIME", m.SHOWTIME, c)
+	excute("encoreTVB", m.EncoreTVB, c)
+	excute("Funimation", m.Funimation, c)
+	excute("Discovery+", m.DiscoveryPlus, c)
+	excute("Paramount+", m.ParamountPlus, c)
+	excute("Peacock TV", m.PeacockTV, c)
+	excute("Popcornflix", m.Popcornflix, c)
+	excute("Crunchyroll", m.Crunchyroll, c)
+	excute("Direct Stream", m.DirectvStream, c)
+	R = append(R, &result{Name: "CA", Divider: true})
+	excute("CBC Gem", m.CBCGem, c)
+	excute("Crave", m.Crave, c)
+}
+
+func SouthAmerica() {
+
 }
 
 func Ipv6Multination() {
@@ -365,8 +404,6 @@ func showAd() {
 }
 
 func main() {
-	// m.DisneyPlus(m.AutoHttpClient)
-	// return
 	client := m.AutoHttpClient
 	mode := 0
 	showVersion := false
@@ -403,7 +440,7 @@ func main() {
 	}
 
 	if IPV4 && M {
-		tot += 13
+		tot += 14
 	}
 	if IPV4 && TW {
 		tot += 10

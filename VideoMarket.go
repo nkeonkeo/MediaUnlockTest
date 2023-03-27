@@ -23,7 +23,7 @@ func VideoMarket(c http.Client) Result {
 	// log.Println(string(b))
 	var res resVideoMarketToken
 	if err := json.Unmarshal(b, &res); err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Success: false}
 	}
 
 	if res.AccessToken == "" {

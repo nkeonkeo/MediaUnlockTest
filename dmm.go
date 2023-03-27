@@ -18,7 +18,7 @@ func DMM(c http.Client) Result {
 	}
 	var res dmmRes
 	if err := json.Unmarshal(b, &res); err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Success: false}
 	}
 	if res.Status.Code == 403 {
 		return Result{Success: false}
