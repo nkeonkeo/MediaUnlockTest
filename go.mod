@@ -1,6 +1,6 @@
 module MediaUnlockTest
 
-go 1.19
+go 1.20
 
 require (
 	github.com/mattn/go-runewidth v0.0.14 // indirect

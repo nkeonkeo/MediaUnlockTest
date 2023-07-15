@@ -22,6 +22,7 @@ import (
 var IPV4 = true
 var IPV6 = true
 var M, TW, HK, JP bool
+var Force bool
 
 type result struct {
 	Name    string
@@ -229,7 +230,7 @@ func Ipv6Multination() {
 	excute("Youtube CDN", m.YoutubeCDN, c)
 }
 
-func GetIpInfo() {
+func GetIpv4Info() {
 	resp, err := m.Ipv4HttpClient.Get("https://www.cloudflare.com/cdn-cgi/trace")
 	if err != nil {
 		IPV4 = false
@@ -247,19 +248,21 @@ func GetIpInfo() {
 	s = s[i+3:]
 	i = strings.Index(s, "\n")
 	fmt.Println("Your IPV4 address:", FontSkyBlue, s[:i], FontSuffix)
-	resp, err = m.Ipv6HttpClient.Get("https://www.cloudflare.com/cdn-cgi/trace")
+}
+func GetIpv6Info() {
+	resp, err := m.Ipv6HttpClient.Get("https://www.cloudflare.com/cdn-cgi/trace")
 	if err != nil {
 		IPV6 = false
 		fmt.Println("No IPv6 support")
 		return
 	}
 	defer resp.Body.Close()
-	b, err = io.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("No IPv6 support")
 	}
-	s = string(b)
-	i = strings.Index(s, "ip=")
+	s := string(b)
+	i := strings.Index(s, "ip=")
 	s = s[i+3:]
 	i = strings.Index(s, "\n")
 	fmt.Println("Your IPV6 address:", FontSkyBlue, s[:i], FontSuffix)
@@ -409,6 +412,7 @@ func main() {
 	showVersion := false
 	update := false
 	flag.IntVar(&mode, "m", 0, "mode 0(default)/4/6")
+	flag.BoolVar(&Force, "f", false, "ipv6 force")
 	flag.BoolVar(&showVersion, "v", false, "show version")
 	flag.BoolVar(&update, "u", false, "update")
 	flag.Parse()
@@ -434,8 +438,10 @@ func main() {
 	fmt.Println("使用方式: " + FontYellow + "curl -Ls unlock.moe | sh" + FontSuffix)
 	fmt.Println()
 
-	GetIpInfo()
-	if IPV4 {
+	GetIpv4Info()
+	GetIpv6Info()
+
+	if IPV4 || Force {
 		ReadSelect()
 	}
 
@@ -452,7 +458,20 @@ func main() {
 		tot += 20
 	}
 	if IPV6 && M {
-		tot += 6
+		if Force {
+			tot += 14
+		} else {
+			tot += 6
+		}
+	}
+	if (IPV6 && Force) && TW {
+		tot += 10
+	}
+	if (IPV6 && Force) && HK {
+		tot += 5
+	}
+	if (IPV6 && Force) && JP {
+		tot += 20
 	}
 	wg = &sync.WaitGroup{}
 	bar = NewBar(tot)
@@ -468,8 +487,23 @@ func main() {
 	if IPV4 && JP {
 		Japan(client)
 	}
-	if IPV6 && M {
-		Ipv6Multination()
+	if IPV6 {
+		if Force {
+			if M {
+				Multination(m.Ipv6HttpClient)
+			}
+			if TW {
+				Taiwan(m.Ipv6HttpClient)
+			}
+			if HK {
+				HongKong(m.Ipv6HttpClient)
+			}
+			if JP {
+				Japan(m.Ipv6HttpClient)
+			}
+		} else {
+			Ipv6Multination()
+		}
 	}
 
 	wg.Wait()

@@ -44,5 +44,5 @@ func HuluJP(c http.Client) Result {
 }
 
 func Hulu(c http.Client) Result {
-	
+	return Result{Success: false}
 }

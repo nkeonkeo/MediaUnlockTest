@@ -2,6 +2,6 @@ package mediaunlocktest
 
 import "net/http"
 
-func ESPNPlus(c http.Client) Result {
+func Crave(c http.Client) Result {
 	return Result{Success: false}
 }
