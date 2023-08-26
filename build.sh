@@ -2,7 +2,8 @@
 # mkdir build
 cd cli
 tp="-gcflags=-trimpath="$GOPATH" -asmflags=-trimpath="$GOPATH
-flags="-w -s -X 'main.buildTime=$(date '+%Y-%m-%d %H:%M:%S')'"
+#flags="-w -s -X 'main.buildTime=$(date '+%Y-%m-%d %H:%M:%S')'"
+flags="-w -s"
 
 # exit
 
@@ -64,3 +65,5 @@ echo "build linux ppc64  ..."
 CGO_ENABLED=0 GOOS=linux GOARCH=ppc64 go build -ldflags="$flags" $tp -o build/unlock-test_linux_ppc64
 echo "build linux ppc64le  ..."
 CGO_ENABLED=0 GOOS=linux GOARCH=ppc64le go build -ldflags="$flags" $tp -o build/unlock-test_linux_ppc64le
+
+upx build/unlock-test_linux*

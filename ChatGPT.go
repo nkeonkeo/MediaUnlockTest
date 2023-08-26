@@ -23,7 +23,7 @@ func ChatGPT(c http.Client) Result {
 	if err != nil {
 		return Result{Success: false, Err: ErrNetwork}
 	}
-	if strings.Contains(resp.Header.Get("content-type"), "text/plain") {
+	if resp.StatusCode == 403 {
 		return Result{Success: false, Info: "Blocked"}
 	}
 	resp, err = GET(c, "https://chat.openai.com/cdn-cgi/trace")

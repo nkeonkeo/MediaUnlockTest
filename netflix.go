@@ -16,7 +16,7 @@ func NetflixRegion(c http.Client) Result {
 		return Result{Success: false, Err: err}
 	}
 	defer resp.Body.Close()
-
+	// log.Println(resp.StatusCode)
 	if resp.StatusCode == 404 {
 		return Result{Success: false, Info: "Originals Only"}
 	}
@@ -28,6 +28,7 @@ func NetflixRegion(c http.Client) Result {
 		if u == "" {
 			return Result{Success: true, Region: "us"}
 		}
+		// log.Println("nf", u)
 		t := strings.SplitN(u, "/", 5)
 		if len(t) < 5 {
 			return Result{Success: false}
