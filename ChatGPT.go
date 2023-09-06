@@ -23,15 +23,21 @@ func ChatGPT(c http.Client) Result {
 	if err != nil {
 		return Result{Success: false, Err: ErrNetwork}
 	}
-	if resp.StatusCode == 403 {
-		return Result{Success: false, Info: "Blocked"}
+	defer resp.Body.Close()
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return Result{Success: false, Err: ErrNetwork}
 	}
+	if strings.Contains(string(b), "VPN") {
+		return Result{Success: false, Info: "VPN Blocked"}
+	}
+
 	resp, err = GET(c, "https://chat.openai.com/cdn-cgi/trace")
 	if err != nil {
 		return Result{Success: false, Err: ErrNetwork}
 	}
 	defer resp.Body.Close()
-	b, err := io.ReadAll(resp.Body)
+	b, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Success: false, Err: ErrNetwork}
 	}
