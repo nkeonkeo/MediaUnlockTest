@@ -10,17 +10,28 @@ import (
 )
 
 var (
-	Version    = "1.0"
-	UA_Browser = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
-	UA_Dalvik  = "Dalvik/2.1.0 (Linux; U; Android 9; ALP-AL00 Build/HUAWEIALP-AL00)"
+	Version          = "1.0"
+	StatusOK         = 1
+	StatusNetworkErr = -1
+	StatusErr        = -2
+	StatusRestricted = 2
+	StatusNo         = 3
+	StatusBanned     = 4
+	StatusFailed     = 5
+	StatusUnexpected = 6
 )
 
 type Result struct {
-	Success bool
-	Region  string
-	Info    string
-	Err     error
+	Status int
+	Region string
+	Info   string
+	Err    error
 }
+
+var (
+	UA_Browser = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
+	UA_Dalvik  = "Dalvik/2.1.0 (Linux; U; Android 9; ALP-AL00 Build/HUAWEIALP-AL00)"
+)
 
 var Dialer = &net.Dialer{
 	Timeout:   5 * time.Second,
@@ -34,7 +45,7 @@ var ipv4Transport = &http.Transport{
 	ForceAttemptHTTP2:     true,
 	MaxIdleConns:          100,
 	IdleConnTimeout:       90 * time.Second,
-	TLSHandshakeTimeout:   10 * time.Second,
+	TLSHandshakeTimeout:   5 * time.Second,
 	ExpectContinueTimeout: 1 * time.Second,
 }
 
@@ -52,7 +63,7 @@ var ipv6Transport = &http.Transport{
 	ForceAttemptHTTP2:     true,
 	MaxIdleConns:          100,
 	IdleConnTimeout:       90 * time.Second,
-	TLSHandshakeTimeout:   10 * time.Second,
+	TLSHandshakeTimeout:   5 * time.Second,
 	ExpectContinueTimeout: 1 * time.Second,
 }
 var Ipv6HttpClient = http.Client{
@@ -109,8 +120,8 @@ func cdo(c http.Client, req *http.Request) (resp *http.Response, err error) {
 	// 	err = ErrNetwork
 	// }
 	// return
-	deadline := time.Now().Add(30 * time.Second)
-	for i := 0; i < 10; i++ {
+	deadline := time.Now().Add(10 * time.Second)
+	for i := 0; i < 3; i++ {
 		if resp, err = c.Do(req); err == nil {
 			return resp, nil
 		}

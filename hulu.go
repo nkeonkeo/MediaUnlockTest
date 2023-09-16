@@ -15,7 +15,7 @@ func HuluJP(c http.Client) Result {
 	c.CheckRedirect = nil
 	req, err := http.NewRequest("GET", "https://www.hulu.jp/login", nil)
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	req.Header.Set("user-agent", UA_Browser)
 	// req.Header.Set("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
@@ -34,15 +34,15 @@ func HuluJP(c http.Client) Result {
 
 	resp, err := cdo(c, req)
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	defer resp.Body.Close()
 	if strings.HasSuffix(resp.Request.URL.Path, "restrict.html") {
-		return Result{Success: false}
+		return Result{Status: StatusNo}
 	}
-	return Result{Success: true}
+	return Result{Status: StatusOK}
 }
 
 func Hulu(c http.Client) Result {
-	return Result{Success: false}
+	return Result{Status: StatusNo}
 }

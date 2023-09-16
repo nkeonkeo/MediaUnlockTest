@@ -59,20 +59,32 @@ var (
 )
 
 func ShowResult(r m.Result) (s string) {
-	if r.Success {
+	if r.Status == m.StatusOK {
 		s = FontGreen + "YES"
 		if r.Region != "" {
 			s += " (region: " + r.Region + ")"
 		}
 		s += FontSuffix
-	} else {
-		if r.Err != nil {
-			return FontYellow + "ERR: (" + r.Err.Error() + ")" + FontSuffix
-		} else if r.Info != "" {
+	} else if r.Status == m.StatusNetworkErr {
+		return FontRed + "NO" + FontSuffix + FontYellow + " (" + r.Err.Error() + ")" + FontSuffix
+	} else if r.Status == m.StatusRestricted {
+		return FontYellow + "Restricted" + " (" + r.Info + ")" + FontSuffix
+	} else if r.Status == m.StatusErr {
+		return FontYellow + "ERR: (" + r.Err.Error() + ")" + FontSuffix
+	} else if r.Status == m.StatusNo {
+		if r.Info != "" {
 			return FontRed + "NO" + FontSuffix + FontYellow + " (" + r.Info + ")" + FontSuffix
 		} else {
 			return FontRed + "NO" + FontSuffix
 		}
+	} else if r.Status == m.StatusBanned {
+		if r.Info != "" {
+			return FontRed + "BAN" + FontSuffix + FontYellow + " (" + r.Info + ")" + FontSuffix
+		} else {
+			return FontRed + "BAN" + FontSuffix
+		}
+	} else if r.Status != m.StatusUnexpected {
+		return FontYellow + "Unexpected" + FontSuffix
 	}
 	return
 }
@@ -94,7 +106,7 @@ func ShowR() {
 			fmt.Println(s)
 		} else {
 			result := ShowResult(r.Value)
-			if r.Value.Success && strings.HasSuffix(r.Name, "CDN") {
+			if r.Value.Status == m.StatusOK && strings.HasSuffix(r.Name, "CDN") {
 				result = FontSkyBlue + r.Value.Region + FontSuffix
 			}
 			fmt.Printf("%-"+strconv.Itoa(NameLength)+"s %s\n", r.Name, result)

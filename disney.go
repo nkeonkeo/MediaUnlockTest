@@ -16,14 +16,14 @@ func requestDisney(c http.Client, URL string, method string) Result {
 	}
 	r, err := http.NewRequest("POST", URL, strings.NewReader(data.Encode()))
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	r.Header.Set("user-agent", UA_Browser)
 	r.Header.Set("authorization", "Bearer ZGlzbmV5JmJyb3dzZXImMS4wLjA.Cu56AgSfBTDag5NiRA81oLHkDZfu5L3CKadnefEAY84")
 	r.Header.Set("content-type", "application/x-www-form-urlencoded")
 	resp, err := cdo(c, r)
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	defer resp.Body.Close()
 	switch method {
@@ -31,53 +31,53 @@ func requestDisney(c http.Client, URL string, method string) Result {
 		defer resp.Body.Close()
 		b, err := io.ReadAll(resp.Body)
 		if err != nil {
-			return Result{Success: false, Err: err}
+			return Result{Status: StatusNetworkErr, Err: err}
 		}
 		s := string(b)
 		// log.Println(s)
 		if strings.Contains(s, "unauthorized") {
-			return Result{Success: false, Err: errors.New("unauthorized")}
+			return Result{Status: StatusFailed, Err: errors.New("unauthorized")}
 		}
 		if strings.Contains(s, "403 ERROR") || strings.Contains(s, "forbidden-location") {
-			return Result{Success: false}
+			return Result{Status: StatusNo}
 		}
-		return Result{Success: true}
+		return Result{Status: StatusOK}
 	case "query":
 		if location := resp.Header.Get("Location"); location == "" {
 			for _, c := range resp.Cookies() {
 				if c.Name == "x-dss-country" {
 					return Result{
-						Success: true,
-						Region:  strings.ToLower(c.Value),
+						Status: StatusOK,
+						Region: strings.ToLower(c.Value),
 					}
 				}
 			}
 			return Result{
-				Success: true,
-				Region:  "unknown",
+				Status: StatusOK,
+				Region: "unknown",
 			}
 		} else if location == "https://disneyplus.disney.co.jp/" {
 			return Result{
-				Success: true,
-				Region:  "jp",
+				Status: StatusOK,
+				Region: "jp",
 			}
 		} else if location == "https://preview.disneyplus.com/unavailable/" {
 			return Result{
-				Success: false,
-				Info:    "unavailable",
+				Status: StatusNo,
+				Info:   "unavailable",
 			}
 		}
 	}
-	return Result{Success: false}
+	return Result{Status: StatusNo}
 }
 
 func DisneyPlus(c http.Client) Result {
 	QueryResult := requestDisney(c, "https://www.disneyplus.com", "query")
-	if !QueryResult.Success {
+	if QueryResult.Status != StatusOK {
 		return QueryResult
 	}
 	VerifyResult := requestDisney(AutoHttpClient, "https://disney.api.edge.bamgrid.com/token", "auth")
-	if !VerifyResult.Success {
+	if VerifyResult.Status != StatusOK {
 		return VerifyResult
 	}
 	return QueryResult

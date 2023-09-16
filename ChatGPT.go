@@ -21,30 +21,33 @@ func SupportGpt(loc string) bool {
 func ChatGPT(c http.Client) Result {
 	resp, err := GET(c, "https://chat.openai.com")
 	if err != nil {
-		return Result{Success: false, Err: ErrNetwork}
+		return Result{Status: StatusNetworkErr, Err: ErrNetwork}
 	}
 	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Result{Success: false, Err: ErrNetwork}
+		return Result{Status: StatusNetworkErr, Err: ErrNetwork}
 	}
 	if strings.Contains(string(b), "VPN") {
-		return Result{Success: false, Info: "VPN Blocked"}
+		return Result{Status: StatusBanned, Info: "VPN Blocked"}
 	}
 
 	resp, err = GET(c, "https://chat.openai.com/cdn-cgi/trace")
 	if err != nil {
-		return Result{Success: false, Err: ErrNetwork}
+		return Result{Status: StatusNetworkErr, Err: ErrNetwork}
 	}
 	defer resp.Body.Close()
 	b, err = io.ReadAll(resp.Body)
 	if err != nil {
-		return Result{Success: false, Err: ErrNetwork}
+		return Result{Status: StatusNetworkErr, Err: ErrNetwork}
 	}
 	s := string(b)
 	i := strings.Index(s, "loc=")
 	s = s[i+4:]
 	i = strings.Index(s, "\n")
 	loc := s[:i]
-	return Result{Success: SupportGpt(loc), Region: strings.ToLower(loc)}
+	if SupportGpt(loc) {
+		return Result{Status: StatusOK, Region: strings.ToLower(loc)}
+	}
+	return Result{Status: StatusNo}
 }

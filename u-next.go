@@ -9,13 +9,13 @@ import (
 func U_NEXT(c http.Client) Result {
 	resp, err := GET(c, "https://video-api.unext.jp/api/1/player?entity%5B%5D=playlist_url&episode_code=ED00148814&title_code=SID0028118&keyonly_flg=0&play_mode=caption&bitrate_low=1500")
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	defer resp.Body.Close()
 
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	var res struct {
 		Data struct {
@@ -27,15 +27,15 @@ func U_NEXT(c http.Client) Result {
 		}
 	}
 	if err := json.Unmarshal(b, &res); err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusErr, Err: err}
 	}
 	switch res.Data.EntitiesData.PlaylistUrl.ResultStatus {
 	case 475:
-		return Result{Success: true}
+		return Result{Status: StatusOK}
 	case 200:
-		return Result{Success: true}
+		return Result{Status: StatusOK}
 	case 467:
-		return Result{Success: false}
+		return Result{Status: StatusNo}
 	}
-	return Result{Success: false, Info: "unknown"}
+	return Result{Status: StatusUnexpected}
 }

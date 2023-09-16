@@ -8,7 +8,7 @@ import (
 func Steam(c http.Client) Result {
 	resp, err := GET(c, "https://store.steampowered.com")
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	defer resp.Body.Close()
 
@@ -16,10 +16,10 @@ func Steam(c http.Client) Result {
 		if c.Name == "steamCountry" {
 			i := strings.Index(c.Value, "%")
 			if i == -1 {
-				return Result{Success: false}
+				return Result{Status: StatusNo}
 			}
-			return Result{Success: true, Region: strings.ToLower(c.Value[:i])}
+			return Result{Status: StatusOK, Region: strings.ToLower(c.Value[:i])}
 		}
 	}
-	return Result{Success: false}
+	return Result{Status: StatusNo}
 }

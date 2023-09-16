@@ -10,39 +10,39 @@ import (
 func YoutubeRegion(c http.Client) Result {
 	resp, err := GET(c, "https://www.youtube.com/red")
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	defer resp.Body.Close()
 
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	s := string(b)
 	if strings.Contains(s, "Premium is not available in your country") {
-		return Result{Success: false}
+		return Result{Status: StatusNo}
 	}
 	if EndLocation := strings.Index(s, `"countryCode":`); EndLocation != -1 {
 		return Result{
-			Success: true,
-			Region:  strings.ToLower(s[EndLocation+15 : EndLocation+17]),
+			Status: StatusOK,
+			Region: strings.ToLower(s[EndLocation+15 : EndLocation+17]),
 		}
 	}
 	if strings.Contains(s, "manageSubscriptionButton") {
-		return Result{Success: true}
+		return Result{Status: StatusOK}
 	}
-	return Result{Success: false}
+	return Result{Status: StatusNo}
 }
 
 func YoutubeCDN(c http.Client) Result {
 	resp, err := GET(c, "https://redirector.googlevideo.com/report_mapping")
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	r := bufio.NewReader(resp.Body)
 	b, _, err := r.ReadLine()
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	s := string(b)
 	i := strings.Index(s, "=> ")
@@ -54,16 +54,16 @@ func YoutubeCDN(c http.Client) Result {
 	if i == -1 {
 		i = strings.Index(s, ".")
 		return Result{
-			Success: true,
-			Region:  findAirCode(s[i+1:]),
-			Info:    "Youtube Video Server",
+			Status: StatusOK,
+			Region: findAirCode(s[i+1:]),
+			Info:   "Youtube Video Server",
 		}
 	} else {
 		isp := s[:i]
 		return Result{
-			Success: true,
-			Region:  isp + " - " + findAirCode(s[i+1:]),
-			Info:    "Google Global CacheCDN (ISP Cooperation)",
+			Status: StatusOK,
+			Region: isp + " - " + findAirCode(s[i+1:]),
+			Info:   "Google Global CacheCDN (ISP Cooperation)",
 		}
 	}
 }

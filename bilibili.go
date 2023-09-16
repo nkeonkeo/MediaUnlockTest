@@ -9,26 +9,26 @@ import (
 func bilibili(c http.Client, url string) Result {
 	resp, err := GET(c, url)
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	var res struct {
 		Code int
 	}
 	if err := json.Unmarshal(b, &res); err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusErr, Err: err}
 	}
 	if res.Code == -10403 {
-		return Result{Success: false}
+		return Result{Status: StatusNo}
 	}
 	if res.Code == 0 {
-		return Result{Success: true}
+		return Result{Status: StatusOK}
 	}
-	return Result{Success: false, Info: "unknown"}
+	return Result{Status: StatusUnexpected, Info: "unknown"}
 }
 
 func BilibiliHKMC(c http.Client) Result {

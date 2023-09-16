@@ -10,15 +10,15 @@ func MyVideo(c http.Client) Result {
 	c.CheckRedirect = nil
 	resp, err := GET(c, "https://www.myvideo.net.tw/login.do")
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	if strings.Contains(string(b), "serviceAreaBlock") {
-		return Result{Success: false}
+		return Result{Status: StatusNo}
 	}
-	return Result{Success: true}
+	return Result{Status: StatusOK}
 }

@@ -11,20 +11,20 @@ func GYAO(c http.Client) Result {
 		`{"query":" query PlaybackFree($fullStoryId: ID!, $vmDevice: vmDevice!, $isPreview: Boolean) { playback: vmPlaybackFree( fullStoryId: $fullStoryId, isPreview: $isPreview, vmDevice: $vmDevice ) { license { playToken } user { userId } content { encodeVersion maxQualityConsent fullPackId } tracking { streamLog } } } ","variables":{"fullStoryId":"244001026","vmDevice":"PC"}}`,
 	)
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	defer resp.Body.Close()
 
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	s := string(b)
 	if strings.Contains(s, "foreign") || strings.Contains(s, "DISALLOW_ADDRESS") {
-		return Result{Success: false}
+		return Result{Status: StatusNo}
 	}
 	if strings.Contains(s, `"playback":{`) {
-		return Result{Success: true}
+		return Result{Status: StatusOK}
 	}
-	return Result{Success: false, Info: "unknown"}
+	return Result{Status: StatusUnexpected}
 }

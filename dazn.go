@@ -11,27 +11,27 @@ func Dazn(c http.Client) Result {
 		`{"LandingPageKey":"generic","Languages":"zh-CN,zh,en","Platform":"web","PlatformAttributes":{},"Manufacturer":"","PromoCode":"","Version":"2"}`,
 	)
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	// log.Println(string(b))
 	var res daznRes
 	if err := json.Unmarshal(b, &res); err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusErr, Err: err}
 	}
 	if res.Region.IsAllowed {
 		return Result{
-			Success: true,
-			Region:  res.Region.GeolocatedCountry,
+			Status: StatusOK,
+			Region: res.Region.GeolocatedCountry,
 		}
 	}
 	return Result{
-		Success: false,
-		Info:    res.Region.DisallowedReason,
+		Status: StatusNo,
+		Info:   res.Region.DisallowedReason,
 	}
 }
 

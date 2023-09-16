@@ -10,22 +10,22 @@ import (
 func TVBAnywhere(c http.Client) Result {
 	resp, err := GET(c, "https://uapisfm.tvbanywhere.com.sg/geoip/check/platform/android")
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	defer resp.Body.Close()
 
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	var res tvbAnywhereRes
 	if err := json.Unmarshal(b, &res); err != nil {
-		return Result{Success: false, Err: err}
+		return Result{Status: StatusErr, Err: err}
 	}
 	if res.AllowInThisCountry {
-		return Result{Success: true, Region: strings.ToLower(res.Country)}
+		return Result{Status: StatusOK, Region: strings.ToLower(res.Country)}
 	}
-	return Result{Success: false}
+	return Result{Status: StatusNo}
 }
 
 type tvbAnywhereRes struct {
