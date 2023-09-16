@@ -1,6 +1,5 @@
 # #!/bin/sh
 # mkdir build
-cd cli
 tp="-gcflags=-trimpath="$GOPATH" -asmflags=-trimpath="$GOPATH
 #flags="-w -s -X 'main.buildTime=$(date '+%Y-%m-%d %H:%M:%S')'"
 flags="-w -s"

@@ -2,18 +2,48 @@ package main
 
 import (
 	mt "MediaUnlockTest"
+	"log"
 	"net/http"
 	"sync"
 )
 
-var R map[string]mt.Result
+var (
+	MUL bool
+	HK  bool
+	JP  bool
+	NA  bool
+	SA  bool
+)
 
-var tot int64
+func Check() {
+	c := mt.AutoHttpClient
+	wg = &sync.WaitGroup{}
+	R = make(map[string]mt.Result)
+	if MUL {
+		Multination(c)
+	}
+	if HK {
+		HongKong(c)
+	}
+	if JP {
+		Japan(c)
+	}
+	if NA {
+		NorthAmerica(c)
+	}
+	if SA {
+
+	}
+	wg.Wait()
+	log.Println("checked")
+}
+
+var R map[string]mt.Result
 var wg *sync.WaitGroup
 
 func excute(Name string, F func(client http.Client) mt.Result, client http.Client) {
 	if _, has := R[Name]; !has {
-		R[Name] = mt.Result{Info: "Waiting"}
+		R[Name] = mt.Result{}
 	}
 	wg.Add(1)
 	go func() {
@@ -120,8 +150,4 @@ func NorthAmerica(c http.Client) {
 	// R = append(R, &result{Name: "CA", Divider: true})
 	excute("CBC Gem", mt.CBCGem, c)
 	excute("Crave", mt.Crave, c)
-}
-
-func Check() {
-
 }
