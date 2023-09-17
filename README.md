@@ -1,6 +1,8 @@
 # MediaUnlockTest
 
-更快的流媒体检测脚本
+更快的流媒体检测工具
+
+## CLI
 
 使用方法: 
 
@@ -19,6 +21,12 @@ bash <(curl -Ls unlock.moe) -m 4
 ```bash
 bash <(curl -Ls unlock.moe) -m 6
 ```
+
+## Monitor
+
+请先了解Prometheus和Grafana
+
+[README](https://github.com/nkeonkeo/MediaUnlockTest/blob/main/monitor/readme.md)
 
 ## Todo
 
