@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -8,8 +9,9 @@ import (
 )
 
 var (
-	Interval = 60
-	Listen   = ":9101"
+	Interval    = 60
+	Listen      = ":9101"
+	ChangeIpCmd string
 
 	rrcStatus *prometheus.GaugeVec
 )
@@ -18,16 +20,26 @@ func init() {
 	rrcStatus = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "media_unblock_status",
 		Help: "Media Unlock Status",
-	}, []string{"mediaName"})
+	}, []string{"mediaName", "region"})
 }
 
 func update() {
+	r := make([]*result, len(R))
+	copy(r, R)
+
 	Check()
-	for k, v := range R {
-		// log.Println(k, v)
+
+	for _, v := range r {
+		rrcStatus.DeleteLabelValues(
+			v.Name,
+			strings.ToUpper(v.Value.Region),
+		)
+	}
+	for _, v := range R {
 		rrcStatus.WithLabelValues(
-			k,
-		).Set(float64(v.Status))
+			v.Name,
+			strings.ToUpper(v.Value.Region),
+		).Set(float64(v.Value.Status))
 	}
 }
 

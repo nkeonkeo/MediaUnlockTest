@@ -21,7 +21,7 @@ func NowE(c http.Client) Result {
 	}
 	var res noweRes
 	if err := json.Unmarshal(b, &res); err != nil {
-		return Result{Status: StatusNetworkErr, Err: err}
+		return Result{Status: StatusUnexpected, Err: err}
 	}
 	if res.ResponseCode == "PRODUCT_INFORMATION_INCOMPLETE" {
 		return Result{Status: StatusOK}

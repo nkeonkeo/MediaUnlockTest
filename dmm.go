@@ -1,13 +1,13 @@
 package mediaunlocktest
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
+	"strings"
 )
 
 func DMM(c http.Client) Result {
-	resp, err := GET(c, "https://api-p.videomarket.jp/v3/api/play/keyauth?playKey=4c9e93baa7ca1fc0b63ccf418275afc2&deviceType=3&bitRate=0&loginFlag=0&connType=")
+	resp, err := GET(c, "https://bitcoin.dmm.com")
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}
@@ -16,22 +16,31 @@ func DMM(c http.Client) Result {
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}
-	var res dmmRes
-	if err := json.Unmarshal(b, &res); err != nil {
-		return Result{Status: StatusErr, Err: err}
-	}
-	if res.Status.Code == 403 {
+	s := string(b)
+	if strings.Contains(s, "This page is not available in your area") {
 		return Result{Status: StatusNo}
 	}
-	// if res.Status.Code == 408 {
-	// 	return Result{Status: StatusOK}
-	// }
-	return Result{Status: StatusOK}
-}
-
-type dmmRes struct {
-	Status struct {
-		Code    int
-		Message string
+	if strings.Contains(s, "暗号資産") {
+		return Result{Status: StatusOK}
 	}
+	return Result{Status: StatusNo, Info: "Unsupported"}
+}
+func DMMTV(c http.Client) Result {
+	resp, err := PostJson(c, "https://api.beacon.dmm.com/v1/streaming/start", `{"player_name":"dmmtv_browser","player_version":"0.0.0","content_type_detail":"VOD_SVOD","content_id":"11uvjcm4fw2wdu7drtd1epnvz","purchase_product_id":null}`)
+	if err != nil {
+		return Result{Status: StatusNetworkErr, Err: err}
+	}
+	defer resp.Body.Close()
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return Result{Status: StatusNetworkErr, Err: err}
+	}
+	s := string(b)
+	if strings.Contains(s, "FOREIGN") {
+		return Result{Status: StatusNo}
+	}
+	if strings.Contains(s, "UNAUTHORIZED") {
+		return Result{Status: StatusOK}
+	}
+	return Result{Status: StatusNo, Info: "Unsupported"}
 }

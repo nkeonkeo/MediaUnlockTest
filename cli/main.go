@@ -66,7 +66,7 @@ func ShowResult(r m.Result) (s string) {
 		}
 		s += FontSuffix
 	} else if r.Status == m.StatusNetworkErr {
-		return FontRed + "NO" + FontSuffix + FontYellow + " (" + r.Err.Error() + ")" + FontSuffix
+		return FontRed + "NO" + FontSuffix + FontYellow + " (Network Err)" + FontSuffix
 	} else if r.Status == m.StatusRestricted {
 		return FontYellow + "Restricted" + " (" + r.Info + ")" + FontSuffix
 	} else if r.Status == m.StatusErr {
@@ -83,7 +83,7 @@ func ShowResult(r m.Result) (s string) {
 		} else {
 			return FontRed + "BAN" + FontSuffix
 		}
-	} else if r.Status != m.StatusUnexpected {
+	} else if r.Status == m.StatusUnexpected {
 		return FontYellow + "Unexpected" + FontSuffix
 	}
 	return
@@ -172,6 +172,7 @@ func Taiwan(c http.Client) {
 func Japan(c http.Client) {
 	R = append(R, &result{Name: "Japan", Divider: true})
 	excute("DMM", m.DMM, c)
+	excute("DMM TV", m.DMMTV, c)
 	excute("Abema", m.Abema, c)
 	excute("Niconico", m.Niconico, c)
 	excute("music.jp", m.MusicJP, c)
@@ -467,7 +468,7 @@ func main() {
 		tot += 5
 	}
 	if IPV4 && JP {
-		tot += 20
+		tot += 21
 	}
 	if IPV6 && M {
 		if Force {
@@ -483,7 +484,7 @@ func main() {
 		tot += 5
 	}
 	if (IPV6 && Force) && JP {
-		tot += 20
+		tot += 21
 	}
 	wg = &sync.WaitGroup{}
 	bar = NewBar(tot)

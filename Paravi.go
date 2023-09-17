@@ -33,5 +33,5 @@ func Paravi(c http.Client) Result {
 	if res.Error.Type == "Unauthorized" {
 		return Result{Status: StatusOK}
 	}
-	return Result{Status: StatusUnexpected}
+	return Result{Status: StatusOK}
 }

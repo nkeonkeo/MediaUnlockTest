@@ -54,7 +54,6 @@ func requestDisney(c http.Client, URL string, method string) Result {
 			}
 			return Result{
 				Status: StatusOK,
-				Region: "unknown",
 			}
 		} else if location == "https://disneyplus.disney.co.jp/" {
 			return Result{

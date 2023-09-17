@@ -2,7 +2,6 @@ package main
 
 import (
 	mt "MediaUnlockTest"
-	"log"
 	"net/http"
 	"sync"
 )
@@ -10,6 +9,7 @@ import (
 var (
 	MUL bool
 	HK  bool
+	TW  bool
 	JP  bool
 	NA  bool
 	SA  bool
@@ -18,12 +18,15 @@ var (
 func Check() {
 	c := mt.AutoHttpClient
 	wg = &sync.WaitGroup{}
-	R = make(map[string]mt.Result)
+	R = make([]*result, 0)
 	if MUL {
 		Multination(c)
 	}
 	if HK {
 		HongKong(c)
+	}
+	if TW {
+		Taiwan(c)
 	}
 	if JP {
 		Japan(c)
@@ -35,20 +38,25 @@ func Check() {
 
 	}
 	wg.Wait()
-	log.Println("checked")
+	// log.Println("checked")
 }
 
-var R map[string]mt.Result
+type result struct {
+	Type  string
+	Name  string
+	Value mt.Result
+}
+
+var R []*result
 var wg *sync.WaitGroup
 
 func excute(Name string, F func(client http.Client) mt.Result, client http.Client) {
-	if _, has := R[Name]; !has {
-		R[Name] = mt.Result{}
-	}
+	r := &result{Name: Name}
+	R = append(R, r)
 	wg.Add(1)
 	go func() {
-		r := F(client)
-		R[Name] = r
+		res := F(client)
+		r.Value = res
 		wg.Done()
 	}()
 }
@@ -77,7 +85,7 @@ func HongKong(c http.Client) {
 	excute("Viu.TV", mt.ViuTV, c)
 	excute("MyTVSuper", mt.MyTvSuper, c)
 	excute("HBO GO Aisa", mt.HboGoAisa, c)
-	excute("BiliBili Hongkong/Macau Only", mt.BilibiliHKMC, c)
+	excute("BiliBili HK/Macau", mt.BilibiliHKMC, c)
 }
 
 func Taiwan(c http.Client) {
@@ -91,12 +99,13 @@ func Taiwan(c http.Client) {
 	excute("CatchPlay+", mt.Catchplay, c)
 	excute("Bahamut Anime", mt.BahamutAnime, c)
 	excute("HBO GO Aisa", mt.HboGoAisa, c)
-	excute("Bilibili Taiwan Only", mt.BilibiliTW, c)
+	excute("Bilibili TW", mt.BilibiliTW, c)
 }
 
 func Japan(c http.Client) {
 	// R = append(R, &result{Name: "Japan", Divider: true})
 	excute("DMM", mt.DMM, c)
+	excute("DMM TV", mt.DMMTV, c)
 	excute("Abema", mt.Abema, c)
 	excute("Niconico", mt.Niconico, c)
 	excute("music.jp", mt.MusicJP, c)

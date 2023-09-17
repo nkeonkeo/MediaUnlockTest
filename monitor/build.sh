@@ -1,8 +1,7 @@
 # #!/bin/sh
 # mkdir build
 tp="-gcflags=-trimpath="$GOPATH" -asmflags=-trimpath="$GOPATH
-#flags="-w -s -X 'main.buildTime=$(date '+%Y-%m-%d %H:%M:%S')'"
-flags="-w -s"
+flags="-w -s -X 'update.buildTime=$(date '+%Y-%m-%d %H:%M:%S')'"
 
 # exit
 
@@ -65,4 +64,4 @@ CGO_ENABLED=0 GOOS=linux GOARCH=ppc64 go build -ldflags="$flags" $tp -o build/un
 echo "build linux ppc64le  ..."
 CGO_ENABLED=0 GOOS=linux GOARCH=ppc64le go build -ldflags="$flags" $tp -o build/unlock-monitor_linux_ppc64le
 
-upx build/unlock-monitor_linux*
+# upx build/unlock-monitor_linux*
