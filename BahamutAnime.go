@@ -23,7 +23,7 @@ func BahamutAnime(c http.Client) Result {
 		Deviceid string
 	}
 	if err := json.Unmarshal(b, &res); err != nil {
-		return Result{Status: StatusErr}
+		return Result{Status: StatusErr, Err: err}
 	}
 	resp, err = GET(c, "https://ani.gamer.com.tw/ajax/token.php?adID=89422&sn=14667&device="+res.Deviceid)
 	if err != nil {
@@ -35,7 +35,7 @@ func BahamutAnime(c http.Client) Result {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	if err := json.Unmarshal(b, &res); err != nil {
-		return Result{Status: StatusErr}
+		return Result{Status: StatusErr, Err: err}
 	}
 	if res.AnimeSn != 0 {
 		return Result{Status: StatusOK}
