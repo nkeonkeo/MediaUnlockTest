@@ -62,7 +62,7 @@ func ShowResult(r m.Result) (s string) {
 	if r.Status == m.StatusOK {
 		s = FontGreen + "YES"
 		if r.Region != "" {
-			s += " (region: " + r.Region + ")"
+			s += " (region: " + strings.ToUpper(r.Region) + ")"
 		}
 		s += FontSuffix
 	} else if r.Status == m.StatusNetworkErr {
