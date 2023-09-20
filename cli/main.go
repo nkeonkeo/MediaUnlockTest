@@ -68,9 +68,18 @@ func ShowResult(r m.Result) (s string) {
 	} else if r.Status == m.StatusNetworkErr {
 		return FontRed + "NO" + FontSuffix + FontYellow + " (Network Err)" + FontSuffix
 	} else if r.Status == m.StatusRestricted {
-		return FontYellow + "Restricted" + " (" + r.Info + ")" + FontSuffix
+		if r.Info != "" {
+			return FontYellow + "Restricted" + " (" + r.Info + ")" + FontSuffix
+		} else {
+			return FontYellow + "Restricted" + FontSuffix
+		}
 	} else if r.Status == m.StatusErr {
-		return FontYellow + "ERR: (" + r.Err.Error() + ")" + FontSuffix
+		s = FontYellow + "ERR"
+		if r.Err != nil {
+			s += ": " + r.Err.Error() + ""
+		}
+		s += FontSuffix
+		return s
 	} else if r.Status == m.StatusNo {
 		if r.Info != "" {
 			return FontRed + "NO" + FontSuffix + FontYellow + " (" + r.Info + ")" + FontSuffix

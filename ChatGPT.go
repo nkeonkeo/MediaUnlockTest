@@ -49,5 +49,5 @@ func ChatGPT(c http.Client) Result {
 	if SupportGpt(loc) {
 		return Result{Status: StatusOK, Region: strings.ToLower(loc)}
 	}
-	return Result{Status: StatusNo}
+	return Result{Status: StatusNo, Region: strings.ToLower(loc)}
 }
