@@ -43,8 +43,14 @@ func ChatGPT(c http.Client) Result {
 	}
 	s := string(b)
 	i := strings.Index(s, "loc=")
+	if i == -1 {
+		return Result{Status: StatusUnexpected}
+	}
 	s = s[i+4:]
 	i = strings.Index(s, "\n")
+	if i == -1 {
+		return Result{Status: StatusUnexpected}
+	}
 	loc := s[:i]
 	if SupportGpt(loc) {
 		return Result{Status: StatusOK, Region: strings.ToLower(loc)}
