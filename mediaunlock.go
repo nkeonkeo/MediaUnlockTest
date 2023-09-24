@@ -2,6 +2,7 @@ package mediaunlocktest
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"net"
 	"net/http"
@@ -47,9 +48,15 @@ var ipv4Transport = &http.Transport{
 	IdleConnTimeout:       90 * time.Second,
 	TLSHandshakeTimeout:   5 * time.Second,
 	ExpectContinueTimeout: 1 * time.Second,
+	TLSClientConfig: &tls.Config{
+		CipherSuites: append(defaultCipherSuites[8:], defaultCipherSuites[:8]...),
+	},
 }
 
 func UseLastResponse(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }
+
+var defaultCipherSuites = []uint16{0xc02f, 0xc030, 0xc02b, 0xc02c, 0xcca8, 0xcca9, 0xc013, 0xc009,
+	0xc014, 0xc00a, 0x009c, 0x009d, 0x002f, 0x0035, 0xc012, 0x000a}
 
 var Ipv4HttpClient = http.Client{
 	CheckRedirect: UseLastResponse,
@@ -65,6 +72,9 @@ var ipv6Transport = &http.Transport{
 	IdleConnTimeout:       90 * time.Second,
 	TLSHandshakeTimeout:   5 * time.Second,
 	ExpectContinueTimeout: 1 * time.Second,
+	TLSClientConfig: &tls.Config{
+		CipherSuites: append(defaultCipherSuites[8:], defaultCipherSuites[:8]...),
+	},
 }
 var Ipv6HttpClient = http.Client{
 	CheckRedirect: UseLastResponse,
@@ -72,7 +82,18 @@ var Ipv6HttpClient = http.Client{
 }
 var AutoHttpClient = http.Client{
 	CheckRedirect: UseLastResponse,
-	Transport:     http.DefaultTransport,
+	Transport: &http.Transport{
+		Proxy:                 http.ProxyFromEnvironment,
+		DialContext:           (&net.Dialer{Timeout: 30 * time.Second, KeepAlive: 30 * time.Second}).DialContext,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+		TLSClientConfig: &tls.Config{
+			CipherSuites: append(defaultCipherSuites[8:], defaultCipherSuites[:8]...),
+		},
+	},
 }
 
 type H [2]string
@@ -100,6 +121,7 @@ func GET(c http.Client, url string, headers ...H) (*http.Response, error) {
 	for _, h := range headers {
 		req.Header.Set(h[0], h[1])
 	}
+	// return c.Do(req)
 	return cdo(c, req)
 }
 

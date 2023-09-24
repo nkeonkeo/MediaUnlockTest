@@ -433,10 +433,12 @@ func main() {
 	mode := 0
 	showVersion := false
 	update := false
+	nf := false
 	flag.IntVar(&mode, "m", 0, "mode 0(default)/4/6")
 	flag.BoolVar(&Force, "f", false, "ipv6 force")
 	flag.BoolVar(&showVersion, "v", false, "show version")
 	flag.BoolVar(&update, "u", false, "update")
+	flag.BoolVar(&nf, "nf", false, "netflix")
 	flag.Parse()
 	if showVersion {
 		fmt.Println(m.Version)
@@ -454,6 +456,11 @@ func main() {
 		client = m.Ipv6HttpClient
 		IPV4 = false
 		M = true
+	}
+
+	if nf {
+		fmt.Println("Netflix", ShowResult(m.NetflixRegion(m.AutoHttpClient)))
+		return
 	}
 
 	fmt.Println("项目地址: " + FontSkyBlue + "https://github.com/nkeonkeo/MediaUnlockTest" + FontSuffix)

@@ -12,15 +12,15 @@ var (
 	Interval    = 60
 	Listen      = ":9101"
 	ChangeIpCmd string
-
-	rrcStatus *prometheus.GaugeVec
+	Node        = ""
+	rrcStatus   *prometheus.GaugeVec
 )
 
 func init() {
 	rrcStatus = promauto.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "media_unblock_status",
 		Help: "Media Unlock Status",
-	}, []string{"mediaName", "region"})
+	}, []string{"node", "mediaName", "region"})
 }
 
 func update() {
@@ -31,12 +31,14 @@ func update() {
 
 	for _, v := range r {
 		rrcStatus.DeleteLabelValues(
+			Node,
 			v.Name,
 			strings.ToUpper(v.Value.Region),
 		)
 	}
 	for _, v := range R {
 		rrcStatus.WithLabelValues(
+			Node,
 			v.Name,
 			strings.ToUpper(v.Value.Region),
 		).Set(float64(v.Value.Status))
