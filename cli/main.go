@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"runtime"
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	m "MediaUnlockTest"
@@ -62,7 +64,7 @@ func ShowResult(r m.Result) (s string) {
 	if r.Status == m.StatusOK {
 		s = FontGreen + "YES"
 		if r.Region != "" {
-			s += " (region: " + strings.ToUpper(r.Region) + ")"
+			s += " (Region: " + strings.ToUpper(r.Region) + ")"
 		}
 		s += FontSuffix
 	} else if r.Status == m.StatusNetworkErr {
@@ -243,7 +245,7 @@ func SouthAmerica() {
 
 func Ipv6Multination() {
 	c := m.Ipv6HttpClient
-	R = append(R, &result{Name: "IPV6 Multination", Divider: true})
+	R = append(R, &result{Name: "\nIPV6 Multination", Divider: true})
 	excute("Hotstar", m.Hotstar, c)
 	excute("Disney+", m.DisneyPlus, c)
 	excute("Netflix", m.NetflixRegion, c)
@@ -434,10 +436,12 @@ func main() {
 	showVersion := false
 	update := false
 	nf := false
+	Iface := ""
 	flag.IntVar(&mode, "m", 0, "mode 0(default)/4/6")
 	flag.BoolVar(&Force, "f", false, "ipv6 force")
 	flag.BoolVar(&showVersion, "v", false, "show version")
 	flag.BoolVar(&update, "u", false, "update")
+	flag.StringVar(&Iface, "I", "", "source ip / interface")
 	flag.BoolVar(&nf, "nf", false, "netflix")
 	flag.Parse()
 	if showVersion {
@@ -447,6 +451,15 @@ func main() {
 	if update {
 		checkUpdate()
 		return
+	}
+	if Iface != "" {
+		if IP := net.ParseIP(Iface); IP != nil {
+			m.Dialer.LocalAddr = &net.TCPAddr{IP: IP}
+		} else {
+			m.Dialer.Control = func(network, address string, c syscall.RawConn) error {
+				return setSocketOptions(network, address, c, Iface)
+			}
+		}
 	}
 	if mode == 4 {
 		client = m.Ipv4HttpClient
