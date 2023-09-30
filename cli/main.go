@@ -114,6 +114,9 @@ func ShowR() {
 			for i := NameLength - len(s) + 4; i > 0; i-- {
 				s += "="
 			}
+			if r.Name == "" {
+				s = "\n"
+			}
 			fmt.Println(s)
 		} else {
 			result := ShowResult(r.Value)
@@ -245,7 +248,8 @@ func SouthAmerica() {
 
 func Ipv6Multination() {
 	c := m.Ipv6HttpClient
-	R = append(R, &result{Name: "\nIPV6 Multination", Divider: true})
+	R = append(R, &result{Name: "", Divider: true})
+	R = append(R, &result{Name: "IPV6 Multination", Divider: true})
 	excute("Hotstar", m.Hotstar, c)
 	excute("Disney+", m.DisneyPlus, c)
 	excute("Netflix", m.NetflixRegion, c)
