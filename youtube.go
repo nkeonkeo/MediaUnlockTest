@@ -46,8 +46,14 @@ func YoutubeCDN(c http.Client) Result {
 	}
 	s := string(b)
 	i := strings.Index(s, "=> ")
+	if i == -1 {
+		return Result{Status: StatusUnexpected}
+	}
 	s = s[i+3:]
 	i = strings.Index(s, " ")
+	if i == -1 {
+		return Result{Status: StatusUnexpected}
+	}
 	s = s[:i]
 	i = strings.Index(s, "-")
 

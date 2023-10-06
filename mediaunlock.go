@@ -43,14 +43,12 @@ var ipv4Transport = &http.Transport{
 	DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 		return Dialer.DialContext(ctx, "tcp4", addr)
 	},
-	ForceAttemptHTTP2:     true,
+	// ForceAttemptHTTP2:     true,
 	MaxIdleConns:          100,
 	IdleConnTimeout:       90 * time.Second,
 	TLSHandshakeTimeout:   5 * time.Second,
 	ExpectContinueTimeout: 1 * time.Second,
-	TLSClientConfig: &tls.Config{
-		CipherSuites: append(defaultCipherSuites[8:], defaultCipherSuites[:8]...),
-	},
+	TLSClientConfig:       tlsConfig,
 }
 
 func UseLastResponse(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }
@@ -66,14 +64,12 @@ var ipv6Transport = &http.Transport{
 	DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
 		return Dialer.DialContext(ctx, "tcp6", addr)
 	},
-	ForceAttemptHTTP2:     true,
+	// ForceAttemptHTTP2:     true,
 	MaxIdleConns:          100,
 	IdleConnTimeout:       90 * time.Second,
 	TLSHandshakeTimeout:   5 * time.Second,
 	ExpectContinueTimeout: 1 * time.Second,
-	TLSClientConfig: &tls.Config{
-		CipherSuites: append(defaultCipherSuites[8:], defaultCipherSuites[:8]...),
-	},
+	TLSClientConfig:       tlsConfig,
 }
 var Ipv6HttpClient = http.Client{
 	CheckRedirect: UseLastResponse,
@@ -82,17 +78,18 @@ var Ipv6HttpClient = http.Client{
 var AutoHttpClient = http.Client{
 	CheckRedirect: UseLastResponse,
 	Transport: &http.Transport{
-		Proxy:                 http.ProxyFromEnvironment,
-		DialContext:           (&net.Dialer{Timeout: 30 * time.Second, KeepAlive: 30 * time.Second}).DialContext,
-		ForceAttemptHTTP2:     true,
+		Proxy:       http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{Timeout: 30 * time.Second, KeepAlive: 30 * time.Second}).DialContext,
+		// ForceAttemptHTTP2:     true,
 		MaxIdleConns:          100,
 		IdleConnTimeout:       90 * time.Second,
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
-		TLSClientConfig: &tls.Config{
-			CipherSuites: append(defaultCipherSuites[8:], defaultCipherSuites[:8]...),
-		},
+		TLSClientConfig:       tlsConfig,
 	},
+}
+var tlsConfig = &tls.Config{
+	CipherSuites: append(defaultCipherSuites[8:], defaultCipherSuites[:8]...),
 }
 
 type H [2]string
@@ -154,7 +151,7 @@ func cdo(c http.Client, req *http.Request) (resp *http.Response, err error) {
 		}
 	}
 	// log.Println(err)
-	return nil, ErrNetwork
+	return nil, err
 }
 func PostJson(c http.Client, url string, data string) (*http.Response, error) {
 	req, err := http.NewRequest("POST", url, strings.NewReader(data))
