@@ -2,6 +2,7 @@ package main
 
 import (
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -14,6 +15,7 @@ var (
 	ChangeIpCmd string
 	Node        = ""
 	rrcStatus   *prometheus.GaugeVec
+	updateLock  = sync.Mutex{}
 )
 
 func init() {
@@ -24,6 +26,9 @@ func init() {
 }
 
 func update() {
+	updateLock.Lock()
+	defer updateLock.Unlock()
+
 	r := make([]*result, len(R))
 	copy(r, R)
 
@@ -46,10 +51,10 @@ func update() {
 }
 
 func recordMetrics() {
-	update()
+	go update()
 	t := time.NewTicker(time.Duration(Interval) * time.Second)
 	defer t.Stop()
 	for range t.C {
-		update()
+		go update()
 	}
 }

@@ -56,6 +56,7 @@ func UseLastResponse(req *http.Request, via []*http.Request) error { return http
 var defaultCipherSuites = []uint16{0xc02f, 0xc030, 0xc02b, 0xc02c, 0xcca8, 0xcca9, 0xc013, 0xc009, 0xc014, 0xc00a, 0x009c, 0x009d, 0x002f, 0x0035, 0xc012, 0x000a}
 
 var Ipv4HttpClient = http.Client{
+	Timeout:       10 * time.Second,
 	CheckRedirect: UseLastResponse,
 	Transport:     ipv4Transport,
 }
@@ -72,10 +73,12 @@ var ipv6Transport = &http.Transport{
 	TLSClientConfig:       tlsConfig,
 }
 var Ipv6HttpClient = http.Client{
+	Timeout:       10 * time.Second,
 	CheckRedirect: UseLastResponse,
 	Transport:     ipv6Transport,
 }
 var AutoHttpClient = http.Client{
+	Timeout:       10 * time.Second,
 	CheckRedirect: UseLastResponse,
 	Transport: &http.Transport{
 		Proxy:       http.ProxyFromEnvironment,
@@ -138,7 +141,7 @@ func cdo(c http.Client, req *http.Request) (resp *http.Response, err error) {
 	// 	err = ErrNetwork
 	// }
 	// return
-	deadline := time.Now().Add(10 * time.Second)
+	deadline := time.Now().Add(30 * time.Second)
 	for i := 0; i < 3; i++ {
 		if resp, err = c.Do(req); err == nil {
 			return resp, nil
