@@ -35,7 +35,7 @@ var (
 )
 
 var Dialer = &net.Dialer{
-	Timeout:   5 * time.Second,
+	Timeout:   10 * time.Second,
 	KeepAlive: 30 * time.Second,
 }
 var ipv4Transport = &http.Transport{
@@ -56,7 +56,7 @@ func UseLastResponse(req *http.Request, via []*http.Request) error { return http
 var defaultCipherSuites = []uint16{0xc02f, 0xc030, 0xc02b, 0xc02c, 0xcca8, 0xcca9, 0xc013, 0xc009, 0xc014, 0xc00a, 0x009c, 0x009d, 0x002f, 0x0035, 0xc012, 0x000a}
 
 var Ipv4HttpClient = http.Client{
-	Timeout:       10 * time.Second,
+	Timeout:       30 * time.Second,
 	CheckRedirect: UseLastResponse,
 	Transport:     ipv4Transport,
 }
@@ -73,12 +73,12 @@ var ipv6Transport = &http.Transport{
 	TLSClientConfig:       tlsConfig,
 }
 var Ipv6HttpClient = http.Client{
-	Timeout:       10 * time.Second,
+	Timeout:       30 * time.Second,
 	CheckRedirect: UseLastResponse,
 	Transport:     ipv6Transport,
 }
 var AutoHttpClient = http.Client{
-	Timeout:       10 * time.Second,
+	Timeout:       30 * time.Second,
 	CheckRedirect: UseLastResponse,
 	Transport: &http.Transport{
 		Proxy:       http.ProxyFromEnvironment,
