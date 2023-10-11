@@ -14,7 +14,7 @@ func main() {
 	var service bool
 	var update bool
 	var version bool
-	flag.IntVar(&Interval, "interval", 60, "check interval (s)")
+	flag.Uint64Var(&Interval, "interval", 60, "check interval (s)")
 	flag.StringVar(&Listen, "listen", ":9101", "listen address")
 	flag.StringVar(&Node, "node", "", "node")
 	flag.BoolVar(&MUL, "mul", true, "Multination")

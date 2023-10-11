@@ -3,15 +3,15 @@ package main
 import (
 	"strings"
 	"sync"
-	"time"
 
+	"github.com/jasonlvhit/gocron"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 var (
-	Interval    = 60
-	Listen      = ":9101"
+	Interval    uint64 = 60
+	Listen             = ":9101"
 	ChangeIpCmd string
 	Node        = ""
 	rrcStatus   *prometheus.GaugeVec
@@ -52,9 +52,6 @@ func update() {
 
 func recordMetrics() {
 	go update()
-	t := time.NewTicker(time.Duration(Interval) * time.Second)
-	defer t.Stop()
-	for range t.C {
-		go update()
-	}
+	gocron.Every(Interval).Seconds().Do(update)
+	<-gocron.Start()
 }
