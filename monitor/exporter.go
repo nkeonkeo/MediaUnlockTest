@@ -29,18 +29,9 @@ func update() {
 	updateLock.Lock()
 	defer updateLock.Unlock()
 
-	r := make([]*result, len(R))
-	copy(r, R)
-
 	Check()
 
-	for _, v := range r {
-		rrcStatus.DeleteLabelValues(
-			Node,
-			v.Name,
-			strings.ToUpper(v.Value.Region),
-		)
-	}
+	rrcStatus.Reset()
 	for _, v := range R {
 		rrcStatus.WithLabelValues(
 			Node,
