@@ -19,6 +19,9 @@ func YoutubeRegion(c http.Client) Result {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	s := string(b)
+	if strings.Contains(s, "www.google.cn") {
+		return Result{Status: StatusNo, Region: "cn"}
+	}
 	if strings.Contains(s, "Premium is not available in your country") {
 		return Result{Status: StatusNo}
 	}

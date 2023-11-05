@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"flag"
 	"fmt"
 	"io"
@@ -441,11 +442,13 @@ func main() {
 	update := false
 	nf := false
 	Iface := ""
+	DnsServers := ""
 	flag.IntVar(&mode, "m", 0, "mode 0(default)/4/6")
 	flag.BoolVar(&Force, "f", false, "ipv6 force")
 	flag.BoolVar(&showVersion, "v", false, "show version")
 	flag.BoolVar(&update, "u", false, "update")
 	flag.StringVar(&Iface, "I", "", "source ip / interface")
+	flag.StringVar(&DnsServers, "dns-servers", "", "specify dns servers")
 	flag.BoolVar(&nf, "nf", false, "netflix")
 	flag.Parse()
 	if showVersion {
@@ -463,6 +466,13 @@ func main() {
 			m.Dialer.Control = func(network, address string, c syscall.RawConn) error {
 				return setSocketOptions(network, address, c, Iface)
 			}
+		}
+	}
+	if DnsServers != "" {
+		m.Dialer.Resolver = &net.Resolver{
+			Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
+				return (&net.Dialer{}).DialContext(ctx, "udp", DnsServers)
+			},
 		}
 	}
 	if mode == 4 {

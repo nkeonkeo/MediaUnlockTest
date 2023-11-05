@@ -37,6 +37,7 @@ var (
 var Dialer = &net.Dialer{
 	Timeout:   30 * time.Second,
 	KeepAlive: 30 * time.Second,
+	// Resolver:  &net.Resolver{},
 }
 var ipv4Transport = &http.Transport{
 	Proxy: http.ProxyFromEnvironment,
