@@ -144,13 +144,16 @@ func cdo(c http.Client, req *http.Request) (resp *http.Response, err error) {
 	// return
 	deadline := time.Now().Add(30 * time.Second)
 	for i := 0; i < 3; i++ {
+		if time.Now().After(deadline) {
+			break
+		}
 		if resp, err = c.Do(req); err == nil {
 			return resp, nil
 		}
 		if strings.Contains(err.Error(), "no such host") {
 			break
 		}
-		if strings.Contains(err.Error(), "timeout") || time.Now().After(deadline) {
+		if strings.Contains(err.Error(), "timeout") {
 			break
 		}
 	}

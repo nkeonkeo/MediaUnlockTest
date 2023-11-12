@@ -4,6 +4,7 @@ import (
 	mt "MediaUnlockTest"
 	"net/http"
 	"sync"
+	"time"
 )
 
 var (
@@ -15,7 +16,7 @@ var (
 	SA  bool
 )
 
-func Check() {
+func Check() bool {
 	c := mt.AutoHttpClient
 	wg = &sync.WaitGroup{}
 	R = make([]*result, 0)
@@ -37,8 +38,18 @@ func Check() {
 	if SA {
 
 	}
-	wg.Wait()
-	// log.Println("checked")
+
+	ch := make(chan struct{})
+	go func() {
+		defer close(ch)
+		wg.Wait()
+	}()
+	select {
+	case <-ch:
+		return true
+	case <-time.After(time.Duration(Interval) * time.Second):
+		return false
+	}
 }
 
 type result struct {

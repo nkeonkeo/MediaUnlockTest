@@ -2,7 +2,6 @@ package main
 
 import (
 	"strings"
-	"sync"
 
 	"github.com/jasonlvhit/gocron"
 	"github.com/prometheus/client_golang/prometheus"
@@ -15,7 +14,7 @@ var (
 	ChangeIpCmd string
 	Node        = ""
 	rrcStatus   *prometheus.GaugeVec
-	updateLock  = sync.Mutex{}
+	updateting  = false
 )
 
 func init() {
@@ -26,19 +25,23 @@ func init() {
 }
 
 func update() {
-	updateLock.Lock()
-	defer updateLock.Unlock()
-
-	Check()
-
-	rrcStatus.Reset()
-	for _, v := range R {
-		rrcStatus.WithLabelValues(
-			Node,
-			v.Name,
-			strings.ToUpper(v.Value.Region),
-		).Set(float64(v.Value.Status))
+	if updateting {
+		return
 	}
+	updateting = true
+
+	if Check() {
+		rrcStatus.Reset()
+		for _, v := range R {
+			rrcStatus.WithLabelValues(
+				Node,
+				v.Name,
+				strings.ToUpper(v.Value.Region),
+			).Set(float64(v.Value.Status))
+		}
+	}
+
+	updateting = false
 }
 
 func recordMetrics() {
