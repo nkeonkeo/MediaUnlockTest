@@ -1,10 +1,12 @@
 package mediaunlocktest
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func VideoMarket(c http.Client) Result {
@@ -30,7 +32,9 @@ func VideoMarket(c http.Client) Result {
 		return Result{Status: StatusNo}
 	}
 
-	req, err := http.NewRequest("POST", "https://api-p.videomarket.jp/v2/api/play/keyissue", strings.NewReader(
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, "POST", "https://api-p.videomarket.jp/v2/api/play/keyissue", strings.NewReader(
 		`fullStoryId=118008001&playChromeCastFlag=false&loginFlag=0`,
 	))
 	if err != nil {
@@ -55,7 +59,7 @@ func VideoMarket(c http.Client) Result {
 		return Result{Status: StatusErr, Err: err}
 	}
 
-	req, err = http.NewRequest("GET", "https://api-p.videomarket.jp/v2/api/play/keyauth?playKey="+rpk.PlayKey+"&deviceType=3&bitRate=0&loginFlag=0&connType=", nil)
+	req, err = http.NewRequestWithContext(ctx, "GET", "https://api-p.videomarket.jp/v2/api/play/keyauth?playKey="+rpk.PlayKey+"&deviceType=3&bitRate=0&loginFlag=0&connType=", nil)
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}

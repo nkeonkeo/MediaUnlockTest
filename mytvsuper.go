@@ -1,13 +1,17 @@
 package mediaunlocktest
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
 )
 
 func MyTvSuper(c http.Client) Result {
-	r, err := http.NewRequest("GET", "https://www.mytvsuper.com/api/auth/getSession/self/", nil)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	r, err := http.NewRequestWithContext(ctx, "GET", "https://www.mytvsuper.com/api/auth/getSession/self/", nil)
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}

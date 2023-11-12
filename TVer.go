@@ -1,13 +1,17 @@
 package mediaunlocktest
 
 import (
+	"context"
 	"io"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func TVer(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://edge.api.brightcove.com/playback/v1/accounts/5102072605001/videos/ref%3Akaguyasama_01", nil)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://edge.api.brightcove.com/playback/v1/accounts/5102072605001/videos/ref%3Akaguyasama_01", nil)
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}

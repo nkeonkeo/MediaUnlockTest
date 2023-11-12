@@ -19,25 +19,12 @@ func SupportGpt(loc string) bool {
 }
 
 func ChatGPT(c http.Client) Result {
-	resp, err := GET(c, "https://chat.openai.com")
+	resp, err := GET(c, "https://chat.openai.com/cdn-cgi/trace")
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: ErrNetwork}
 	}
 	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return Result{Status: StatusNetworkErr, Err: ErrNetwork}
-	}
-	if strings.Contains(string(b), "VPN") {
-		return Result{Status: StatusBanned, Info: "VPN Blocked"}
-	}
-
-	resp, err = GET(c, "https://chat.openai.com/cdn-cgi/trace")
-	if err != nil {
-		return Result{Status: StatusNetworkErr, Err: ErrNetwork}
-	}
-	defer resp.Body.Close()
-	b, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: ErrNetwork}
 	}
@@ -52,6 +39,23 @@ func ChatGPT(c http.Client) Result {
 		return Result{Status: StatusUnexpected}
 	}
 	loc := s[:i]
+
+	resp, err = GET(c, "https://chat.openai.com")
+	if err != nil {
+		return Result{Status: StatusNetworkErr, Err: ErrNetwork}
+	}
+	defer resp.Body.Close()
+	b, err = io.ReadAll(resp.Body)
+	if err != nil {
+		return Result{Status: StatusNetworkErr, Err: ErrNetwork}
+	}
+	if strings.Contains(string(b), "VPN") {
+		return Result{Status: StatusBanned, Info: "VPN Blocked"}
+	}
+	if resp.StatusCode == 429 {
+		return Result{Status: StatusRestricted, Region: strings.ToLower(loc), Info: "429 Rate limit"}
+	}
+
 	if SupportGpt(loc) {
 		return Result{Status: StatusOK, Region: strings.ToLower(loc)}
 	}

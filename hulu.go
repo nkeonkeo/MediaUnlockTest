@@ -1,8 +1,10 @@
 package mediaunlocktest
 
 import (
+	"context"
 	"net/http"
 	"strings"
+	"time"
 )
 
 // func myCheckRedirect(req *http.Request, via []*http.Request) error {
@@ -12,8 +14,10 @@ import (
 // }
 
 func HuluJP(c http.Client) Result {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 	c.CheckRedirect = nil
-	req, err := http.NewRequest("GET", "https://www.hulu.jp/login", nil)
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://www.hulu.jp/login", nil)
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}

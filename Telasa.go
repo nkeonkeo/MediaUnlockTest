@@ -1,13 +1,17 @@
 package mediaunlocktest
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
 )
 
 func Telasa(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://api-videopass-anon.kddi-video.com/v1/playback/system_status", nil)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://api-videopass-anon.kddi-video.com/v1/playback/system_status", nil)
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}

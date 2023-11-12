@@ -1,9 +1,15 @@
 package mediaunlocktest
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+	"time"
+)
 
 func KonosubaFD(c http.Client) Result {
-	req, err := http.NewRequest("POST", "https://api.konosubafd.jp/api/masterlist", nil)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, "POST", "https://api.konosubafd.jp/api/masterlist", nil)
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}

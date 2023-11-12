@@ -3,6 +3,7 @@ package mediaunlocktest
 import (
 	"bufio"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -16,6 +17,7 @@ func YoutubeRegion(c http.Client) Result {
 
 	b, err := io.ReadAll(resp.Body)
 	if err != nil {
+		log.Println(err)
 		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	s := string(b)

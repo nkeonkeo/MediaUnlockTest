@@ -1,10 +1,16 @@
 package mediaunlocktest
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+	"time"
+)
 
 // Project Sekai: Colorful Stage
 func PJSK(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://game-version.sekai.colorfulpalette.org/1.8.1/3ed70b6a-8352-4532-b819-108837926ff5", nil)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://game-version.sekai.colorfulpalette.org/1.8.1/3ed70b6a-8352-4532-b819-108837926ff5", nil)
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}

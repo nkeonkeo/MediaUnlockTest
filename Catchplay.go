@@ -1,13 +1,17 @@
 package mediaunlocktest
 
 import (
+	"context"
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
 )
 
 func Catchplay(c http.Client) Result {
-	req, err := http.NewRequest("GET", "https://sunapi.catchplay.com/geo", nil)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	req, err := http.NewRequestWithContext(ctx, "GET", "https://sunapi.catchplay.com/geo", nil)
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}
