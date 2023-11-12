@@ -16,24 +16,36 @@ var (
 	SA  bool
 )
 
-func Check() bool {
-	c := mt.AutoHttpClient
-	wg := &sync.WaitGroup{}
-	R = []*result{}
+type TEST struct {
+	Client  http.Client
+	Results []*result
+	Wg      *sync.WaitGroup
+}
+
+func NewTest() *TEST {
+	t := &TEST{
+		Client:  mt.NewAutoHttpClient(),
+		Results: make([]*result, 0),
+		Wg:      &sync.WaitGroup{},
+	}
+	return t
+}
+
+func (T *TEST) Check() bool {
 	if MUL {
-		Multination(wg, c)
+		T.Multination()
 	}
 	if HK {
-		HongKong(wg, c)
+		T.HongKong()
 	}
 	if TW {
-		Taiwan(wg, c)
+		T.Taiwan()
 	}
 	if JP {
-		Japan(wg, c)
+		T.Japan()
 	}
 	if NA {
-		NorthAmerica(wg, c)
+		T.NorthAmerica()
 	}
 	if SA {
 
@@ -42,12 +54,12 @@ func Check() bool {
 	ch := make(chan struct{})
 	go func() {
 		defer close(ch)
-		wg.Wait()
+		T.Wg.Wait()
 	}()
 	select {
 	case <-ch:
 		return false
-	case <-time.After(time.Duration(Interval) * time.Second):
+	case <-time.After(30 * time.Second):
 		return true
 	}
 }
@@ -58,115 +70,113 @@ type result struct {
 	Value mt.Result
 }
 
-var R []*result
-
-func excute(w *sync.WaitGroup, Name string, F func(client http.Client) mt.Result, client http.Client) {
+func (T *TEST) excute(Name string, F func(client http.Client) mt.Result) {
 	r := &result{Name: Name}
-	R = append(R, r)
-	w.Add(1)
+	T.Results = append(T.Results, r)
+	T.Wg.Add(1)
 	go func() {
-		res := F(client)
+		res := F(T.Client)
 		r.Value = res
-		w.Done()
+		T.Wg.Done()
 	}()
 }
 
-func Multination(w *sync.WaitGroup, c http.Client) {
+func (T *TEST) Multination() {
 	// R = append(R, &result{Name: "Multination", Divider: true})
-	excute(w, "Dazn", mt.Dazn, c)
-	excute(w, "Hotstar", mt.Hotstar, c)
-	excute(w, "Disney+", mt.DisneyPlus, c)
-	excute(w, "Netflix", mt.NetflixRegion, c)
-	excute(w, "Netflix CDN", mt.NetflixCDN, c)
-	excute(w, "Youtube", mt.YoutubeRegion, c)
-	excute(w, "Youtube CDN", mt.YoutubeCDN, c)
-	excute(w, "Amazon Prime Video", mt.PrimeVideo, c)
-	excute(w, "TVBAnywhere+", mt.TVBAnywhere, c)
-	excute(w, "iQyi", mt.IqRegion, c)
-	excute(w, "Viu.com", mt.ViuCom, c)
-	excute(w, "Spotify", mt.Spotify, c)
-	excute(w, "Steam", mt.Steam, c)
-	excute(w, "ChatGPT", mt.ChatGPT, c)
+	T.excute("Dazn", mt.Dazn)
+	T.excute("Hotstar", mt.Hotstar)
+	T.excute("Disney+", mt.DisneyPlus)
+	T.excute("Netflix", mt.NetflixRegion)
+	T.excute("Netflix CDN", mt.NetflixCDN)
+	T.excute("Youtube", mt.YoutubeRegion)
+	T.excute("Youtube CDN", mt.YoutubeCDN)
+	T.excute("Amazon Prime Video", mt.PrimeVideo)
+	T.excute("TVBAnywhere+", mt.TVBAnywhere)
+	T.excute("iQyi", mt.IqRegion)
+	T.excute("Viu.com", mt.ViuCom)
+	T.excute("Spotify", mt.Spotify)
+	T.excute("Steam", mt.Steam)
+	T.excute("ChatGPT", mt.ChatGPT)
 }
 
-func HongKong(w *sync.WaitGroup, c http.Client) {
+func (T *TEST) HongKong() {
 	// R = append(R, &result{Name: "Hong Kong", Divider: true})
-	excute(w, "Now E", mt.NowE, c)
-	excute(w, "Viu.TV", mt.ViuTV, c)
-	excute(w, "MyTVSuper", mt.MyTvSuper, c)
-	excute(w, "HBO GO Aisa", mt.HboGoAisa, c)
-	excute(w, "BiliBili HK/Macau", mt.BilibiliHKMC, c)
+	T.excute("Now E", mt.NowE)
+	T.excute("Viu.TV", mt.ViuTV)
+	T.excute("MyTVSuper", mt.MyTvSuper)
+	T.excute("HBO GO Aisa", mt.HboGoAisa)
+	T.excute("BiliBili HK/Macau", mt.BilibiliHKMC)
 }
 
-func Taiwan(w *sync.WaitGroup, c http.Client) {
+func (T *TEST) Taiwan() {
 	// R = append(R, &result{Name: "Taiwan", Divider: true})
-	excute(w, "KKTV", mt.KKTV, c)
-	excute(w, "LiTV", mt.LiTV, c)
-	excute(w, "MyVideo", mt.MyVideo, c)
-	excute(w, "4GTV", mt.TW4GTV, c)
-	excute(w, "LineTV", mt.LineTV, c)
-	excute(w, "Hami Video", mt.HamiVideo, c)
-	excute(w, "CatchPlay+", mt.Catchplay, c)
-	excute(w, "Bahamut Anime", mt.BahamutAnime, c)
-	excute(w, "HBO GO Aisa", mt.HboGoAisa, c)
-	excute(w, "Bilibili TW", mt.BilibiliTW, c)
+	T.excute("KKTV", mt.KKTV)
+	T.excute("LiTV", mt.LiTV)
+	T.excute("MyVideo", mt.MyVideo)
+	T.excute("4GTV", mt.TW4GTV)
+	T.excute("LineTV", mt.LineTV)
+	T.excute("Hami Video", mt.HamiVideo)
+	T.excute("CatchPlay+", mt.Catchplay)
+	T.excute("Bahamut Anime", mt.BahamutAnime)
+	T.excute("HBO GO Aisa", mt.HboGoAisa)
+	T.excute("Bilibili TW", mt.BilibiliTW)
 }
 
-func Japan(w *sync.WaitGroup, c http.Client) {
+func (T *TEST) Japan() {
 	// R = append(R, &result{Name: "Japan", Divider: true})
-	excute(w, "DMM", mt.DMM, c)
-	excute(w, "DMM TV", mt.DMMTV, c)
-	excute(w, "Abema", mt.Abema, c)
-	excute(w, "Niconico", mt.Niconico, c)
-	excute(w, "music.jp", mt.MusicJP, c)
-	excute(w, "Telasa", mt.Telasa, c)
-	excute(w, "Paravi", mt.Paravi, c)
-	excute(w, "U-NEXT", mt.U_NEXT, c)
-	excute(w, "Hulu Japan", mt.HuluJP, c)
-	excute(w, "GYAO!", mt.GYAO, c)
-	excute(w, "VideoMarket", mt.VideoMarket, c)
-	excute(w, "FOD(Fuji TV)", mt.FOD, c)
-	excute(w, "Radiko", mt.Radiko, c)
-	excute(w, "Karaoke@DAM", mt.Karaoke, c)
-	excute(w, "J:COM On Demand", mt.J_COM_ON_DEMAND, c)
-	excute(w, "Kancolle", mt.Kancolle, c)
-	excute(w, "Pretty Derby Japan", mt.PrettyDerbyJP, c)
-	excute(w, "Konosuba Fantastic Days", mt.KonosubaFD, c)
-	excute(w, "Princess Connect Re:Dive Japan", mt.PCRJP, c)
-	excute(w, "World Flipper Japan", mt.WFJP, c)
-	excute(w, "Project Sekai: Colorful Stage", mt.PJSK, c)
+	T.excute("DMM", mt.DMM)
+	T.excute("DMM TV", mt.DMMTV)
+	T.excute("Abema", mt.Abema)
+	T.excute("Niconico", mt.Niconico)
+	T.excute("music.jp", mt.MusicJP)
+	T.excute("Telasa", mt.Telasa)
+	T.excute("Paravi", mt.Paravi)
+	T.excute("U-NEXT", mt.U_NEXT)
+	T.excute("Hulu Japan", mt.HuluJP)
+	T.excute("GYAO!", mt.GYAO)
+	T.excute("VideoMarket", mt.VideoMarket)
+	T.excute("FOD(Fuji TV)", mt.FOD)
+	T.excute("Radiko", mt.Radiko)
+	T.excute("Karaoke@DAM", mt.Karaoke)
+	T.excute("J:COM On Demand", mt.J_COM_ON_DEMAND)
+	T.excute("Kancolle", mt.Kancolle)
+	T.excute("Pretty Derby Japan", mt.PrettyDerbyJP)
+	T.excute("Konosuba Fantastic Days", mt.KonosubaFD)
+	T.excute("Princess Connect Re:Dive Japan", mt.PCRJP)
+	T.excute("World Flipper Japan", mt.WFJP)
+	T.excute("Project Sekai: Colorful Stage", mt.PJSK)
 }
 
-func NorthAmerica(w *sync.WaitGroup, c http.Client) {
+func (T *TEST) NorthAmerica() {
 	// R = append(R, &result{Name: "North America", Divider: true})
-	excute(w, "FOX", mt.Fox, c)
-	excute(w, "Hulu", mt.Hulu, c)
-	excute(w, "ESPN+", mt.ESPNPlus, c)
-	excute(w, "Epix", mt.Epix, c)
-	excute(w, "Starz", mt.Starz, c)
-	excute(w, "Philo", mt.Philo, c)
-	excute(w, "FXNOW", mt.FXNOW, c)
-	excute(w, "TLC GO", mt.TlcGo, c)
-	excute(w, "HBO Max", mt.HBOMax, c)
-	excute(w, "Shudder", mt.Shudder, c)
-	excute(w, "BritBox", mt.BritBox, c)
-	excute(w, "CW TV", mt.CW_TV, c)
-	excute(w, "NBA TV", mt.NBA_TV, c)
-	excute(w, "Fubo TV", mt.FuboTV, c)
-	excute(w, "Tubi TV", mt.TubiTV, c)
-	excute(w, "Sling TV", mt.SlingTV, c)
-	excute(w, "Pluto TV", mt.PlutoTV, c)
-	excute(w, "Acorn TV", mt.AcornTV, c)
-	excute(w, "SHOWTIME", mt.SHOWTIME, c)
-	excute(w, "encoreTVB", mt.EncoreTVB, c)
-	excute(w, "Funimation", mt.Funimation, c)
-	excute(w, "Discovery+", mt.DiscoveryPlus, c)
-	excute(w, "Paramount+", mt.ParamountPlus, c)
-	excute(w, "Peacock TV", mt.PeacockTV, c)
-	excute(w, "Popcornflix", mt.Popcornflix, c)
-	excute(w, "Crunchyroll", mt.Crunchyroll, c)
-	excute(w, "Direct Stream", mt.DirectvStream, c)
+	T.excute("FOX", mt.Fox)
+	T.excute("Hulu", mt.Hulu)
+	T.excute("ESPN+", mt.ESPNPlus)
+	T.excute("Epix", mt.Epix)
+	T.excute("Starz", mt.Starz)
+	T.excute("Philo", mt.Philo)
+	T.excute("FXNOW", mt.FXNOW)
+	T.excute("TLC GO", mt.TlcGo)
+	T.excute("HBO Max", mt.HBOMax)
+	T.excute("Shudder", mt.Shudder)
+	T.excute("BritBox", mt.BritBox)
+	T.excute("CW TV", mt.CW_TV)
+	T.excute("NBA TV", mt.NBA_TV)
+	T.excute("Fubo TV", mt.FuboTV)
+	T.excute("Tubi TV", mt.TubiTV)
+	T.excute("Sling TV", mt.SlingTV)
+	T.excute("Pluto TV", mt.PlutoTV)
+	T.excute("Acorn TV", mt.AcornTV)
+	T.excute("SHOWTIME", mt.SHOWTIME)
+	T.excute("encoreTVB", mt.EncoreTVB)
+	T.excute("Funimation", mt.Funimation)
+	T.excute("Discovery+", mt.DiscoveryPlus)
+	T.excute("Paramount+", mt.ParamountPlus)
+	T.excute("Peacock TV", mt.PeacockTV)
+	T.excute("Popcornflix", mt.Popcornflix)
+	T.excute("Crunchyroll", mt.Crunchyroll)
+	T.excute("Direct Stream", mt.DirectvStream)
 	// R = append(R, &result{Name: "CA", Divider: true})
-	excute(w, "CBC Gem", mt.CBCGem, c)
-	excute(w, "Crave", mt.Crave, c)
+	T.excute("CBC Gem", mt.CBCGem)
+	T.excute("Crave", mt.Crave)
 }

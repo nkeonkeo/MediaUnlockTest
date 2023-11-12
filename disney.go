@@ -75,7 +75,7 @@ func DisneyPlus(c http.Client) Result {
 	if QueryResult.Status != StatusOK {
 		return QueryResult
 	}
-	VerifyResult := requestDisney(AutoHttpClient, "https://disney.api.edge.bamgrid.com/token", "auth")
+	VerifyResult := requestDisney(c, "https://disney.api.edge.bamgrid.com/token", "auth")
 	if VerifyResult.Status != StatusOK {
 		return VerifyResult
 	}

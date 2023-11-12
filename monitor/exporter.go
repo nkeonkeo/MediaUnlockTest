@@ -1,9 +1,11 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"strings"
+	"time"
 
-	"github.com/jasonlvhit/gocron"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
@@ -14,7 +16,6 @@ var (
 	ChangeIpCmd string
 	Node        = ""
 	rrcStatus   *prometheus.GaugeVec
-	updateting  = false
 )
 
 func init() {
@@ -25,31 +26,24 @@ func init() {
 }
 
 func update() {
-
-	if updateting {
-		return
-	}
-	updateting = true
-
-	Check()
-
+	T := NewTest()
+	T.Check()
 	rrcStatus.Reset()
-	for _, v := range R {
+	log.Println("update:")
+	for _, v := range T.Results {
+		fmt.Println(v.Name, v.Value.Region, v.Value.Status)
 		rrcStatus.WithLabelValues(
 			Node,
 			v.Name,
 			strings.ToUpper(v.Value.Region),
 		).Set(float64(v.Value.Status))
 	}
-	updateting = false
 }
 
 func recordMetrics() {
 	go update()
-	if Interval%60 == 0 {
-		gocron.Every(Interval / 60).Minute().Do(update)
-	} else {
-		gocron.Every(Interval).Seconds().Do(update)
+	t := time.NewTicker(time.Duration(Interval) * time.Second)
+	for range t.C {
+		go update()
 	}
-	<-gocron.Start()
 }

@@ -78,20 +78,25 @@ var Ipv6HttpClient = http.Client{
 	CheckRedirect: UseLastResponse,
 	Transport:     ipv6Transport,
 }
-var AutoHttpClient = http.Client{
-	Timeout:       30 * time.Second,
-	CheckRedirect: UseLastResponse,
-	Transport: &http.Transport{
-		Proxy:       http.ProxyFromEnvironment,
-		DialContext: (&net.Dialer{Timeout: 30 * time.Second, KeepAlive: 30 * time.Second}).DialContext,
-		// ForceAttemptHTTP2:     true,
-		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
-		TLSHandshakeTimeout:   10 * time.Second,
-		ExpectContinueTimeout: 1 * time.Second,
-		TLSClientConfig:       tlsConfig,
-	},
+var AutoHttpClient = NewAutoHttpClient()
+
+func NewAutoHttpClient() http.Client {
+	return http.Client{
+		Timeout:       30 * time.Second,
+		CheckRedirect: UseLastResponse,
+		Transport: &http.Transport{
+			Proxy:       http.ProxyFromEnvironment,
+			DialContext: (&net.Dialer{Timeout: 30 * time.Second, KeepAlive: 30 * time.Second}).DialContext,
+			// ForceAttemptHTTP2:     true,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       90 * time.Second,
+			TLSHandshakeTimeout:   10 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+			TLSClientConfig:       tlsConfig,
+		},
+	}
 }
+
 var tlsConfig = &tls.Config{
 	CipherSuites: append(defaultCipherSuites[8:], defaultCipherSuites[:8]...),
 }
