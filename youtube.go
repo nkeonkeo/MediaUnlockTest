@@ -33,7 +33,7 @@ func YoutubeRegion(c http.Client) Result {
 			Region: strings.ToLower(s[EndLocation+15 : EndLocation+17]),
 		}
 	}
-	if strings.Contains(s, "manageSubscriptionButton") {
+	if strings.Contains(s, "premiumPurchaseButton") {
 		return Result{Status: StatusOK}
 	}
 	return Result{Status: StatusNo}
