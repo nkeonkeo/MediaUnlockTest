@@ -9,7 +9,7 @@ import (
 )
 
 func YoutubeRegion(c http.Client) Result {
-	resp, err := GET(c, "https://www.youtube.com/red")
+	resp, err := GET(c, "https://www.youtube.com/premium")
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}
@@ -33,7 +33,7 @@ func YoutubeRegion(c http.Client) Result {
 			Region: strings.ToLower(s[EndLocation+15 : EndLocation+17]),
 		}
 	}
-	if strings.Contains(s, "premiumPurchaseButton") || strings.Contains(s, "manageSubscriptionButton") {
+	if strings.Contains(s, "premiumPurchaseButton") || strings.Contains(s, "manageSubscriptionButton") || strings.Contains(s, "/月") || strings.Contains(s, "/month") {
 		return Result{Status: StatusOK}
 	}
 	return Result{Status: StatusNo}
