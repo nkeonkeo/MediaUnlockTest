@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/prometheus/client_golang v1.17.0
 	github.com/schollz/progressbar/v3 v3.14.1
-	golang.org/x/sys v0.14.0
+	golang.org/x/sys v0.17.0
 )
 
 require (
@@ -20,6 +20,8 @@ require (
 	github.com/prometheus/common v0.44.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
-	golang.org/x/term v0.14.0 // indirect
+	golang.org/x/net v0.21.0 // indirect
+	golang.org/x/term v0.17.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 )

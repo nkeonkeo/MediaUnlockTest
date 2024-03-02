@@ -9,6 +9,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"runtime"
 	"strconv"
@@ -24,7 +25,7 @@ import (
 
 var IPV4 = true
 var IPV6 = true
-var M, TW, HK, JP bool
+var M, TW, HK, JP, NA, SA bool
 var Force bool
 
 type result struct {
@@ -213,7 +214,7 @@ func NorthAmerica(c http.Client) {
 	R = append(R, &result{Name: "North America", Divider: true})
 	excute("FOX", m.Fox, c)
 	excute("Hulu", m.Hulu, c)
-	excute("ESPN+", m.ESPNPlus, c)
+	// excute("ESPN+", m.ESPNPlus, c)
 	excute("Epix", m.Epix, c)
 	excute("Starz", m.Starz, c)
 	excute("Philo", m.Philo, c)
@@ -263,6 +264,7 @@ func GetIpv4Info() {
 	resp, err := m.Ipv4HttpClient.Get("https://www.cloudflare.com/cdn-cgi/trace")
 	if err != nil {
 		IPV4 = false
+		log.Println(err)
 		fmt.Println("No IPv4 support")
 		return
 	}
@@ -303,6 +305,7 @@ func ReadSelect() {
 	fmt.Println("[1]: 台湾平台")
 	fmt.Println("[2]: 香港平台")
 	fmt.Println("[3]: 日本平台")
+	fmt.Println("[4]: 北美平台")
 	fmt.Print("请输入对应数字,空格分隔(回车确认): ")
 	r := bufio.NewReader(os.Stdin)
 	l, _, err := r.ReadLine()
@@ -320,8 +323,10 @@ func ReadSelect() {
 			HK = true
 		case "3":
 			JP = true
+		case "4":
+			NA = true
 		default:
-			M, TW, HK, JP = true, true, true, true
+			M, TW, HK, JP, NA = true, true, true, true, true
 		}
 	}
 }
@@ -435,6 +440,10 @@ func showAd() {
 	fmt.Println(string(b))
 }
 
+var setSocketOptions = func(network, address string, c syscall.RawConn, interfaceName string) (err error) {
+	return
+}
+
 func main() {
 	client := m.AutoHttpClient
 	mode := 0
@@ -443,12 +452,14 @@ func main() {
 	nf := false
 	Iface := ""
 	DnsServers := ""
+	httpProxy := ""
 	flag.IntVar(&mode, "m", 0, "mode 0(default)/4/6")
 	flag.BoolVar(&Force, "f", false, "ipv6 force")
 	flag.BoolVar(&showVersion, "v", false, "show version")
 	flag.BoolVar(&update, "u", false, "update")
 	flag.StringVar(&Iface, "I", "", "source ip / interface")
 	flag.StringVar(&DnsServers, "dns-servers", "", "specify dns servers")
+	flag.StringVar(&httpProxy, "http-proxy", "", "http proxy")
 	flag.BoolVar(&nf, "nf", false, "netflix")
 	flag.Parse()
 	if showVersion {
@@ -473,6 +484,20 @@ func main() {
 			Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
 				return (&net.Dialer{}).DialContext(ctx, "udp", DnsServers)
 			},
+		}
+	}
+	if httpProxy != "" {
+		log.Println(httpProxy)
+		// c := httpproxy.Config{HTTPProxy: httpProxy, CGI: true}
+		// m.ClientProxy = func(req *http.Request) (*url.URL, error) { return c.ProxyFunc()(req.URL) }
+		if u, err := url.Parse(httpProxy); err == nil {
+			m.ClientProxy = http.ProxyURL(u)
+			m.Ipv4Transport.Proxy = m.ClientProxy
+			m.Ipv4HttpClient.Transport = m.Ipv4Transport
+			m.Ipv6Transport.Proxy = m.ClientProxy
+			m.Ipv6HttpClient.Transport = m.Ipv6Transport
+			m.AutoTransport.Proxy = m.ClientProxy
+			m.AutoHttpClient.Transport = m.AutoTransport
 		}
 	}
 	if mode == 4 {
@@ -531,17 +556,22 @@ func main() {
 	}
 	wg = &sync.WaitGroup{}
 	bar = NewBar(tot)
-	if IPV4 && M {
-		Multination(client)
-	}
-	if IPV4 && TW {
-		Taiwan(client)
-	}
-	if IPV4 && HK {
-		HongKong(client)
-	}
-	if IPV4 && JP {
-		Japan(client)
+	if IPV4 {
+		if M {
+			Multination(client)
+		}
+		if TW {
+			Taiwan(client)
+		}
+		if HK {
+			HongKong(client)
+		}
+		if JP {
+			Japan(client)
+		}
+		if NA {
+			NorthAmerica(client)
+		}
 	}
 	if IPV6 {
 		if Force {
@@ -556,6 +586,9 @@ func main() {
 			}
 			if JP {
 				Japan(m.Ipv6HttpClient)
+			}
+			if NA {
+				NorthAmerica(m.Ipv6HttpClient)
 			}
 		} else {
 			Ipv6Multination()

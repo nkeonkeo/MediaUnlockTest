@@ -1,12 +1,12 @@
 package mediaunlocktest
 
 import (
-	"context"
 	"crypto/tls"
 	"errors"
 	"net"
 	"net/http"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -39,11 +39,17 @@ var Dialer = &net.Dialer{
 	KeepAlive: 30 * time.Second,
 	// Resolver:  &net.Resolver{},
 }
-var ipv4Transport = &http.Transport{
-	Proxy: http.ProxyFromEnvironment,
-	DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-		return Dialer.DialContext(ctx, "tcp4", addr)
-	},
+var ClientProxy = http.ProxyFromEnvironment
+var Ipv4Transport = &http.Transport{
+	Proxy: ClientProxy,
+	DialContext: (&net.Dialer{
+		Timeout: 30 * time.Second, KeepAlive: 30 * time.Second,
+		Control: func(network, address string, c syscall.RawConn) error {
+			if network == "ipv4" {
+				return errors.New("force ipv6")
+			}
+			return nil
+		}}).DialContext,
 	// ForceAttemptHTTP2:     true,
 	MaxIdleConns:          100,
 	IdleConnTimeout:       90 * time.Second,
@@ -55,17 +61,21 @@ var ipv4Transport = &http.Transport{
 func UseLastResponse(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }
 
 var defaultCipherSuites = []uint16{0xc02f, 0xc030, 0xc02b, 0xc02c, 0xcca8, 0xcca9, 0xc013, 0xc009, 0xc014, 0xc00a, 0x009c, 0x009d, 0x002f, 0x0035, 0xc012, 0x000a}
-
 var Ipv4HttpClient = http.Client{
 	Timeout:       30 * time.Second,
 	CheckRedirect: UseLastResponse,
-	Transport:     ipv4Transport,
+	Transport:     Ipv4Transport,
 }
-var ipv6Transport = &http.Transport{
-	Proxy: http.ProxyFromEnvironment,
-	DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-		return Dialer.DialContext(ctx, "tcp6", addr)
-	},
+var Ipv6Transport = &http.Transport{
+	Proxy: ClientProxy,
+	DialContext: (&net.Dialer{
+		Timeout: 30 * time.Second, KeepAlive: 30 * time.Second,
+		Control: func(network, address string, c syscall.RawConn) error {
+			if network == "ipv6" {
+				return errors.New("force ipv4")
+			}
+			return nil
+		}}).DialContext,
 	// ForceAttemptHTTP2:     true,
 	MaxIdleConns:          100,
 	IdleConnTimeout:       90 * time.Second,
@@ -76,24 +86,27 @@ var ipv6Transport = &http.Transport{
 var Ipv6HttpClient = http.Client{
 	Timeout:       30 * time.Second,
 	CheckRedirect: UseLastResponse,
-	Transport:     ipv6Transport,
+	Transport:     Ipv6Transport,
 }
+
 var AutoHttpClient = NewAutoHttpClient()
+
+var AutoTransport = &http.Transport{
+	Proxy:       ClientProxy,
+	DialContext: (&net.Dialer{Timeout: 30 * time.Second, KeepAlive: 30 * time.Second}).DialContext,
+	// ForceAttemptHTTP2:     true,
+	MaxIdleConns:          100,
+	IdleConnTimeout:       90 * time.Second,
+	TLSHandshakeTimeout:   10 * time.Second,
+	ExpectContinueTimeout: 1 * time.Second,
+	TLSClientConfig:       tlsConfig,
+}
 
 func NewAutoHttpClient() http.Client {
 	return http.Client{
 		Timeout:       30 * time.Second,
 		CheckRedirect: UseLastResponse,
-		Transport: &http.Transport{
-			Proxy:       http.ProxyFromEnvironment,
-			DialContext: (&net.Dialer{Timeout: 30 * time.Second, KeepAlive: 30 * time.Second}).DialContext,
-			// ForceAttemptHTTP2:     true,
-			MaxIdleConns:          100,
-			IdleConnTimeout:       90 * time.Second,
-			TLSHandshakeTimeout:   10 * time.Second,
-			ExpectContinueTimeout: 1 * time.Second,
-			TLSClientConfig:       tlsConfig,
-		},
+		Transport:     AutoTransport,
 	}
 }
 
