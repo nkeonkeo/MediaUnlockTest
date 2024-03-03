@@ -43,6 +43,7 @@ func excute(Name string, F func(client http.Client) m.Result, client http.Client
 	r := &result{Name: Name}
 	R = append(R, r)
 	wg.Add(1)
+	tot++
 	go func() {
 		r.Value = F(client)
 		bar.Describe(Name + " " + ShowResult(r.Value))
@@ -526,37 +527,8 @@ func main() {
 	if IPV4 || Force {
 		ReadSelect()
 	}
-
-	if IPV4 && M {
-		tot += 14
-	}
-	if IPV4 && TW {
-		tot += 10
-	}
-	if IPV4 && HK {
-		tot += 5
-	}
-	if IPV4 && JP {
-		tot += 21
-	}
-	if IPV6 && M {
-		if Force {
-			tot += 14
-		} else {
-			tot += 6
-		}
-	}
-	if (IPV6 && Force) && TW {
-		tot += 10
-	}
-	if (IPV6 && Force) && HK {
-		tot += 5
-	}
-	if (IPV6 && Force) && JP {
-		tot += 21
-	}
 	wg = &sync.WaitGroup{}
-	bar = NewBar(tot)
+	bar = NewBar(0)
 	if IPV4 {
 		if M {
 			Multination(client)
@@ -595,6 +567,7 @@ func main() {
 			Ipv6Multination()
 		}
 	}
+	bar.ChangeMax64(tot)
 
 	wg.Wait()
 	bar.Finish()
