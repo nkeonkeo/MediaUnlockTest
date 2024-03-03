@@ -216,7 +216,7 @@ func NorthAmerica(c http.Client) {
 	excute("FOX", m.Fox, c)
 	excute("Hulu", m.Hulu, c)
 	excute("NFL+", m.NFLPlus, c)
-	// excute("ESPN+", m.ESPNPlus, c)
+	excute("ESPN+", m.ESPNPlus, c)
 	excute("Epix", m.Epix, c)
 	excute("Starz", m.Starz, c)
 	excute("Philo", m.Philo, c)
