@@ -53,7 +53,7 @@ var Ipv4Transport = &http.Transport{
 	// ForceAttemptHTTP2:     true,
 	MaxIdleConns:          100,
 	IdleConnTimeout:       90 * time.Second,
-	TLSHandshakeTimeout:   5 * time.Second,
+	TLSHandshakeTimeout:   30 * time.Second,
 	ExpectContinueTimeout: 1 * time.Second,
 	TLSClientConfig:       tlsConfig,
 }
@@ -79,7 +79,7 @@ var Ipv6Transport = &http.Transport{
 	// ForceAttemptHTTP2:     true,
 	MaxIdleConns:          100,
 	IdleConnTimeout:       90 * time.Second,
-	TLSHandshakeTimeout:   5 * time.Second,
+	TLSHandshakeTimeout:   30 * time.Second,
 	ExpectContinueTimeout: 1 * time.Second,
 	TLSClientConfig:       tlsConfig,
 }
@@ -97,7 +97,7 @@ var AutoTransport = &http.Transport{
 	// ForceAttemptHTTP2:     true,
 	MaxIdleConns:          100,
 	IdleConnTimeout:       90 * time.Second,
-	TLSHandshakeTimeout:   10 * time.Second,
+	TLSHandshakeTimeout:   30 * time.Second,
 	ExpectContinueTimeout: 1 * time.Second,
 	TLSClientConfig:       tlsConfig,
 }
