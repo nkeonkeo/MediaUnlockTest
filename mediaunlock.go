@@ -178,7 +178,7 @@ func cdo(c http.Client, req *http.Request) (resp *http.Response, err error) {
 	// log.Println(err)
 	return nil, err
 }
-func PostJson(c http.Client, url string, data string) (*http.Response, error) {
+func PostJson(c http.Client, url string, data string, headers ...H) (*http.Response, error) {
 	req, err := http.NewRequest("POST", url, strings.NewReader(data))
 	if err != nil {
 		return nil, err
@@ -199,6 +199,10 @@ func PostJson(c http.Client, url string, data string) (*http.Response, error) {
 	req.Header.Set("sec-fetch-site", "none")
 	req.Header.Set("sec-fetch-user", "?1")
 	req.Header.Set("upgrade-insecure-requests", "1")
+
+	for _, h := range headers {
+		req.Header.Set(h[0], h[1])
+	}
 
 	return cdo(c, req)
 }

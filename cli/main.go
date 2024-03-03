@@ -214,6 +214,7 @@ func NorthAmerica(c http.Client) {
 	R = append(R, &result{Name: "North America", Divider: true})
 	excute("FOX", m.Fox, c)
 	excute("Hulu", m.Hulu, c)
+	excute("NFL+", m.NFLPlus, c)
 	// excute("ESPN+", m.ESPNPlus, c)
 	excute("Epix", m.Epix, c)
 	excute("Starz", m.Starz, c)
@@ -400,7 +401,7 @@ func checkUpdate() {
 		log.Fatal("[ERR] 更改unlock-test后端权限出错:", err)
 	}
 	if _, err := os.Stat("/usr/bin/unlock-test"); err == nil {
-		if os.Remove("/usr/bin/unlock-test") != nil {
+		if err := os.Remove("/usr/bin/unlock-test"); err != nil {
 			log.Fatal("[ERR] 删除unlock-test旧版本时出错:", err.Error())
 		}
 	}

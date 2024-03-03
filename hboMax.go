@@ -13,10 +13,13 @@ func HBOMax(c http.Client) Result {
 	}
 	defer resp.Body.Close()
 	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return Result{Status: StatusNetworkErr, Err: err}
+	}
 	s := string(b)
 	if strings.Contains(s, "geo-availability") {
 		return Result{Status: StatusNo}
 	}
-
-	return Result{Status: StatusNo}
+	region := strings.Split(resp.Header.Get("location"), "/")[3]
+	return Result{Status: StatusOK, Region: strings.ToUpper(region)}
 }

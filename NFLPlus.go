@@ -6,8 +6,9 @@ import (
 	"strings"
 )
 
-func Shudder(c http.Client) Result {
-	resp, err := GET(c, "https://www.shudder.com/")
+func NFLPlus(c http.Client) Result {
+	url := "https://www.nfl.com/plus/"
+	resp, err := GET(c, url)
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}
@@ -17,7 +18,7 @@ func Shudder(c http.Client) Result {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}
 	s := string(b)
-	if strings.Contains(s, "not available") {
+	if strings.Contains(s, "nflgamepass") {
 		return Result{Status: StatusNo}
 	}
 	return Result{Status: StatusOK}

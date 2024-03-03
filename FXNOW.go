@@ -16,7 +16,7 @@ func FXNOW(c http.Client) Result {
 	if err != nil {
 		return Result{Status: StatusNetworkErr, Err: err}
 	}
-	if !strings.Contains(string(b), "is not accessible") {
+	if strings.Contains(string(b), "is not accessible") {
 		return Result{Status: StatusNo}
 	}
 	return Result{Status: StatusOK}

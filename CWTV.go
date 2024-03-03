@@ -1,7 +1,24 @@
 package mediaunlocktest
 
-import "net/http"
+import (
+	"io"
+	"net/http"
+	"strings"
+)
 
 func CW_TV(c http.Client) Result {
-	return Result{Status: StatusNo}
+	resp, err := GET(c, "https://www.cwtv.com/")
+	if err != nil {
+		return Result{Status: StatusNetworkErr, Err: err}
+	}
+	defer resp.Body.Close()
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return Result{Status: StatusNetworkErr, Err: err}
+	}
+	s := string(b)
+	if strings.Contains(s, "302 Found") {
+		return Result{Status: StatusNo}
+	}
+	return Result{Status: StatusOK}
 }
