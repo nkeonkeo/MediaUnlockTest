@@ -22,6 +22,12 @@ bash <(curl -Ls unlock.moe) -m 4
 bash <(curl -Ls unlock.moe) -m 6
 ```
 
+|args|description|
+|-|-|
+|`--dns-servers`|specify dns servers|
+|`-I`|bind source ip address / interface|
+|`--http-proxy`|set proxy (example: "http://username:password@127.0.0.1:1080")|
+
 ## Monitor
 
 请先了解Prometheus和Grafana
