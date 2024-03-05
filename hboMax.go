@@ -20,6 +20,10 @@ func HBOMax(c http.Client) Result {
 	if strings.Contains(s, "geo-availability") {
 		return Result{Status: StatusNo}
 	}
-	region := strings.Split(resp.Header.Get("location"), "/")[3]
+	t := strings.Split(resp.Header.Get("location"), "/")
+	region := ""
+	if len(t) >= 4 {
+		region = strings.Split(resp.Header.Get("location"), "/")[3]
+	}
 	return Result{Status: StatusOK, Region: strings.ToUpper(region)}
 }
