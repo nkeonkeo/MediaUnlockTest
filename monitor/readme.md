@@ -22,18 +22,20 @@ Usage of unlock-monitor:
         check interval (s) (default 60)
   -service
         setup systemd service
-  -hk
-        Hong Kong
-  -jp
-        Japan
   -mul
         Multination (default true)
+  -hk
+        Hong Kong
+  -tw
+        Taiwan
+  -jp
+        Japan
   -na
         North America
   -sa
         South America
-  -tw
-        Taiwan
+  -eu
+        Europe
   -u    check update
   -v    show version
 ```
