@@ -25,7 +25,7 @@ import (
 
 var IPV4 = true
 var IPV6 = true
-var M, TW, HK, JP, NA, SA bool
+var M, TW, HK, JP, NA, SA, EU bool
 var Force bool
 
 type result struct {
@@ -161,6 +161,8 @@ func Multination(c http.Client) {
 	excute("Spotify", m.Spotify, c)
 	excute("Steam", m.Steam, c)
 	excute("ChatGPT", m.ChatGPT, c)
+	excute("Wikipedia", m.WikipediaEditable, c)
+	excute("Reddit", m.Reddit, c)
 }
 
 func HongKong(c http.Client) {
@@ -246,8 +248,17 @@ func NorthAmerica(c http.Client) {
 	excute("Crave", m.Crave, c)
 }
 
-func SouthAmerica() {
+func SouthAmerica(c http.Client) {
+    R = append(R, &result{Name: "South America", Divider: true})
+    excute("Star Plus", m.StarPlus, c)
+    excute("DirecTV GO", m.DirecTVGO, c)
+}
 
+func Europe(c http.Client) {
+    R = append(R, &result{Name: "Europe", Divider: true})
+    excute("BBC iPlayer", m.BBCiPlayer, c)
+    excute("Rakuten TV", m.RakutenTV, c)
+    excute("Sky Show Time", m.SkyShowTime, c)
 }
 
 func Ipv6Multination() {
@@ -260,6 +271,8 @@ func Ipv6Multination() {
 	excute("Netflix CDN", m.NetflixCDN, c)
 	excute("Youtube", m.YoutubeRegion, c)
 	excute("Youtube CDN", m.YoutubeCDN, c)
+	excute("Wikipedia", m.WikipediaEditable, c)
+	excute("Reddit", m.Reddit, c)
 }
 
 func GetIpv4Info() {
@@ -308,6 +321,8 @@ func ReadSelect() {
 	fmt.Println("[2]: 香港平台")
 	fmt.Println("[3]: 日本平台")
 	fmt.Println("[4]: 北美平台")
+	fmt.Println("[5]: 南美平台")
+	fmt.Println("[6]: 欧洲平台")
 	fmt.Print("请输入对应数字,空格分隔(回车确认): ")
 	r := bufio.NewReader(os.Stdin)
 	l, _, err := r.ReadLine()
@@ -327,8 +342,12 @@ func ReadSelect() {
 			JP = true
 		case "4":
 			NA = true
+		case "5":
+		    SA = true
+		case "6":
+		    EU = true
 		default:
-			M, TW, HK, JP, NA = true, true, true, true, true
+			M, TW, HK, JP, NA, SA, EU = true, true, true, true, true, true, true
 		}
 	}
 }
@@ -545,6 +564,12 @@ func main() {
 		if NA {
 			NorthAmerica(client)
 		}
+		if SA {
+			SouthAmerica(client)
+		}
+		if EU {
+			Europe(client)
+		}
 	}
 	if IPV6 {
 		if Force {
@@ -563,6 +588,12 @@ func main() {
 			if NA {
 				NorthAmerica(m.Ipv6HttpClient)
 			}
+			if SA {
+		    	SouthAmerica(m.Ipv6HttpClient)
+	    	}
+	    	if EU {
+	    		Europe(m.Ipv6HttpClient)
+	    	}
 		} else {
 			Ipv6Multination()
 		}
