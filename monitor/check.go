@@ -14,6 +14,7 @@ var (
 	JP  bool
 	NA  bool
 	SA  bool
+	EU  bool
 )
 
 type TEST struct {
@@ -48,7 +49,10 @@ func (T *TEST) Check() bool {
 		T.NorthAmerica()
 	}
 	if SA {
-
+        T.SouthAmerica()
+	}
+	if EU {
+		T.Europe()
 	}
 
 	ch := make(chan struct{})
@@ -97,6 +101,8 @@ func (T *TEST) Multination() {
 	T.excute("Spotify", mt.Spotify)
 	T.excute("Steam", mt.Steam)
 	T.excute("ChatGPT", mt.ChatGPT)
+	T.excute("Wikipedia", mt.WikipediaEditable)
+	T.excute("Reddit", mt.Reddit)
 }
 
 func (T *TEST) HongKong() {
@@ -179,4 +185,17 @@ func (T *TEST) NorthAmerica() {
 	// R = append(R, &result{Name: "CA", Divider: true})
 	T.excute("CBC Gem", mt.CBCGem)
 	T.excute("Crave", mt.Crave)
+}
+
+func (T *TEST) SouthAmerica() {
+    //R = append(R, &result{Name: "South America", Divider: true})
+    T.excute("Star Plus", mt.StarPlus)
+    T.excute("DirecTV GO", mt.DirecTVGO)
+}
+
+func (T *TEST) Europe() {
+    //R = append(R, &result{Name: "Europe", Divider: true})
+    T.excute("BBC iPlayer", mt.BBCiPlayer)
+    T.excute("Rakuten TV", mt.RakutenTV)
+    //excute("Sky Show Time", m.SkyShowTime, c)
 }
