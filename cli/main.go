@@ -258,7 +258,7 @@ func Europe(c http.Client) {
     R = append(R, &result{Name: "Europe", Divider: true})
     excute("BBC iPlayer", m.BBCiPlayer, c)
     excute("Rakuten TV", m.RakutenTV, c)
-    excute("Sky Show Time", m.SkyShowTime, c)
+    //excute("Sky Show Time", m.SkyShowTime, c)
 }
 
 func Ipv6Multination() {
