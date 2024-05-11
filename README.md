@@ -55,6 +55,12 @@ import "https://github.com/HsukqiLee/MediaUnlockTest"
 
 你可以使用它制作解锁监控等小玩具
 
+## 参与开发的小伙伴
+
+<!--GAMFC_DELIMITER-->
+
+<!--GAMFC_DELIMITER_END-->
+
 ## 鸣谢
 
 原项目基于 [lmc的全能检测脚本](https://github.com/lmc999/RegionRestrictionCheck) 的思路使用 Golang 重构，提供更快的检测速度。
