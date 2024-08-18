@@ -498,8 +498,9 @@ func main() {
 			m.Ipv4HttpClient.Transport = m.Ipv4Transport
 			m.Ipv6Transport.Proxy = m.ClientProxy
 			m.Ipv6HttpClient.Transport = m.Ipv6Transport
-			m.AutoTransport.Proxy = m.ClientProxy
-			m.AutoHttpClient.Transport = m.AutoTransport
+			autoTransport := m.AutoTransport()
+			autoTransport.Proxy = m.ClientProxy
+			m.AutoHttpClient.Transport = autoTransport
 		}
 	}
 	if mode == 4 {
