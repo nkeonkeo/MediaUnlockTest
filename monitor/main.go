@@ -13,6 +13,7 @@ import (
 func main() {
 	var service bool
 	var update bool
+	var authToken string
 	var version bool
 	flag.Uint64Var(&Interval, "interval", 60, "check interval (s)")
 	flag.StringVar(&Listen, "listen", ":9101", "listen address")
@@ -23,6 +24,8 @@ func main() {
 	flag.BoolVar(&JP, "jp", false, "Japan")
 	flag.BoolVar(&NA, "na", false, "North America")
 	flag.BoolVar(&SA, "sa", false, "South")
+
+	flag.StringVar(&authToken, "token", "", "check token in http headers or queries")
 
 	flag.BoolVar(&service, "service", false, "setup systemd service")
 	flag.BoolVar(&update, "u", false, "check update")
@@ -43,7 +46,20 @@ func main() {
 		return
 	}
 	go recordMetrics()
-	http.Handle("/metrics", promhttp.Handler())
+	handler := promhttp.Handler()
+	http.HandleFunc("/metrics", func(w http.ResponseWriter, r *http.Request) {
+		if authToken != "" {
+			token := r.URL.Query().Get("token")
+			if token == "" {
+				token = r.Header.Get("token")
+			}
+			if token != authToken {
+				w.Write([]byte("wrong token"))
+				return
+			}
+		}
+		handler.ServeHTTP(w, r)
+	})
 	log.Println("serve on " + Listen)
 	http.ListenAndServe(Listen, nil)
 }
